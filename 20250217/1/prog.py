@@ -1,4 +1,5 @@
 import sys
+import zlib
 from glob import iglob
 from os.path import basename
 
@@ -15,9 +16,20 @@ def view_commit(commit_id):
     print(obj_text)
 
     _, obj_text_ = obj_text.split('tree ')
-    tree_id = obj_text_.split('\n')[0]
+    is_initial = False
+    if 'parent' in obj_text:
+        tree_id, parent_id = obj_text_.split('\nparent ')
+    else:
+        is_initial = True
+        tree_id = obj_text_.split('\nauthor')[0]
+        parent_id = None
+
     print('tree', tree_id)
     view_tree(tree_id)
+
+    if not is_initial:
+        print('-' * 80)
+        view_commit(parent_id)
 
 def view_tree(tree_id):
     tree_filepath = f'.git/objects/{tree_id[:2]}/{tree_id[2:]}'
