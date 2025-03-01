@@ -25,6 +25,10 @@ def move_player(direction):
         encounter(x, y)
 
 def add_monster(name, x, y, hello):
+    if name not in cowsay.list_cows():
+        print("Cannot add unknown monster")
+        return
+
     try:
         x, y = int(x), int(y)
         if not (0 <= x < GRID_SIZE and 0 <= y < GRID_SIZE):
