@@ -72,7 +72,7 @@ def process_command(command):
     
     if parts[0] in {"up", "down", "left", "right"}:
         move_player(parts[0])
-    
+
     elif parts[0] == "addmon" and len(parts) >= 9:
         if 'hello' in parts and 'hp' in parts and 'coords' in parts:
             hello_index = parts.index('hello') + 1
@@ -93,6 +93,7 @@ def process_command(command):
                 return
 
             add_monster(parts[1], x_coord, y_coord, hello_string, hitpoints)
+
         else:
             print("Invalid addmon command")
     else:
