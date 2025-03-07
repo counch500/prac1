@@ -83,6 +83,7 @@ def process_command(command):
             hitpoints = parts[hp_index]
             x_coord = parts[coords_index]
             y_coord = parts[coords_index + 1]
+
             try:
                 hitpoints = int(hitpoints)
                 if hitpoints <= 0:
