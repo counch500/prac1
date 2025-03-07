@@ -99,6 +99,7 @@ def process_command(command):
         print("Invalid command")
 
 def main():
+    print("<<< Welcome to Python-MUD 0.1 >>>")
     for line in sys.stdin:
         process_command(line)
 
