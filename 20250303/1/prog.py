@@ -25,6 +25,7 @@ def move_player(direction):
     if (x, y) in monsters:
         encounter(x, y)
 
+<<<<<<< HEAD
 def add_custom_monster(hello):
     jgsbat = """               ,_                    _, 
                ) '-._  ,_    _,  _.-' (
@@ -57,7 +58,9 @@ def add_monster(name, x, y, hello, hitpoints):
 
     replaced = (x, y) in monsters
     monsters[(x, y)] = (name, hello, hitpoints)
+
     print(f"Added monster {name} at ({x}, {y}) saying {hello} with {hitpoints} hitpoints")
+
     if replaced:
         print("Replaced the old monster")
 
