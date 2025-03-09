@@ -25,7 +25,6 @@ def move_player(direction):
     if (x, y) in monsters:
         encounter(x, y)
 
-<<<<<<< HEAD
 def add_custom_monster(hello):
     jgsbat = """               ,_                    _, 
                ) '-._  ,_    _,  _.-' (
@@ -44,7 +43,7 @@ def add_monster(name, x, y, hello, hitpoints):
         add_custom_monster(hello)
         return
 
-    if name not in cowsay.list_cows() and name != "jgsbat":
+    if name not in cowsay.list_cows() and name != "jgsbat" and name != "cow":
         print(f"Cannot add unknown monster: {name}")
         return
 
