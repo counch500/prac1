@@ -109,10 +109,25 @@ class MudGame(cmd.Cmd):
         else:
             print("Invalid addmon command")
 
-def main():
-    print("<<< Welcome to Python-MUD 0.1 >>>")
-    for line in sys.stdin:
-        process_command(line)
+    def do_attack(self, arg):
+        "Attack a monster: attack"
+        x, y = self.player_position
+        if (x, y) not in self.monsters:
+            print("No monster here")
+            return
 
-main()
+        name, hello, hp = self.monsters[(x, y)]
+        damage = min(10, hp)
+        hp -= damage
+        print(f"Attacked {name}, damage {damage} hp")
+
+        if hp <= 0:
+            print(f"{name} died")
+            del self.monsters[(x, y)]
+        else:
+            print(f"{name} now has {hp} hp")
+            self.monsters[(x, y)] = (name, hello, hp)
+if __name__ == "__main__":
+    print("<<< Welcome to Python-MUD 0.1 >>>")
+    MudGame().cmdloop()
 
