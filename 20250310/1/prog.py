@@ -1,6 +1,7 @@
 import sys
 import cowsay
 import shlex
+import cmd
 
 GRID_SIZE = 10
 
@@ -9,28 +10,30 @@ class MudGame(cmd.Cmd):
 
     def __init__(self):
         super().__init__()
-        player_position = [0, 0]
-        monsters = {}
+        self.player_position = [0, 0]
+        self.monsters = {}
         self.weapons = {"sword": 10, "spear": 15, "axe": 20}
+        self.field_size = GRID_SIZE
     def move_player(self, direction):
         x, y = self.player_position
         if direction == "up":
-            y = (y - 1) % GRID_SIZE
+            y = y - 1 if y > 0 else GRID_SIZE - 1
         elif direction == "down":
-            y = (y + 1) % GRID_SIZE
+            y = y + 1 if y < GRID_SIZE - 1 else 0
         elif direction == "left":
-            x = (x - 1) % GRID_SIZE
+            x = x - 1 if x > 0 else GRID_SIZE - 1
         elif direction == "right":
-            x = (x + 1) % GRID_SIZE
+            x = x + 1 if x < GRID_SIZE - 1 else 0
         else:
             print("Invalid command")
             return
+
         self.player_position[0], self.player_position[1] = x, y
         print(f"Moved to ({x}, {y})")
         if (x, y) in self.monsters:
             self.encounter(x, y)
 
-    def add_custom_monster(self, hello):
+    def add_custom_monster(self, hello,x, y, hitpoints):
         jgsbat = """               ,_                    _, 
                ) '-._  ,_    _,  _.-' (
                )  _.-'.|\\--//|.'-._  (
@@ -42,7 +45,9 @@ class MudGame(cmd.Cmd):
                     (((""  ""))) """
         print(jgsbat)
         print(hello)
-
+        name = "jgsbat"
+        self.monsters[(x, y)] = (name, hello, hitpoints)
+        print(f"Custom monster {name} added at ({x}, {y}) saying {hello} with {hitpoints} hitpoints")
     def add_monster(self, name, x, y, hello, hitpoints):
         if name == "jgsbat":
             self.add_custom_monster(hello)
@@ -69,8 +74,16 @@ class MudGame(cmd.Cmd):
             print("Replaced the old monster")
 
     def encounter(self, x, y):
+        if (x, y) not in self.monsters:
+            print("No monster here")
+            return
+
         name, hello, hitpoints = self.monsters[(x, y)]
-        print(cowsay.cowsay(hello, cow=name))
+
+        if name == "jgsbat":
+            self.add_custom_monster(hello, x, y, hitpoints)
+        else:
+            print(cowsay.cowsay(hello, cow=name))
 
     def do_move(self, arg):
         "Move the player in a direction: move <up|down|left|right>"
@@ -81,33 +94,34 @@ class MudGame(cmd.Cmd):
 
     def do_addmon(self, arg):
         "Add a monster: addmon <name> coords <x> <y> hello <message> hp <hitpoints>"
-        parts = shlex.split(arg)
-        if len(parts) < 9:
-            print("Invalid addmon command")
+        usage = "Usage: addmon <NAME> hello <MESSAGE> hp <HP> coords <X> <Y>"
+        args = shlex.split(arg)
+        if len(args) < 7:
+            print("Invalid arguments\n{usage}")
             return
-        if 'hello' in parts and 'hp' in parts and 'coords' in parts:
-            hello_index = parts.index('hello') + 1
-            hp_index = parts.index('hp') + 1
-            coords_index = parts.index('coords') + 1
+        name, hello, hp, x, y = None, None, None, None, None
+        try:
+            name = args[0]
+            hello = args[args.index('hello') + 1]
+            hp = int(args[args.index('hp') + 1])
+            x, y = int(args[args.index('coords') + 1]), int(args[args.index('coords') + 2])
 
-            hello_string = parts[hello_index]
-            hitpoints = parts[hp_index]
-            x_coord = parts[coords_index]
-            y_coord = parts[coords_index + 1]
-
-            try:
-                hitpoints = int(hitpoints)
-                if hitpoints <= 0:
-                    print("Invalid hitpoints value")
-                    return
-            except ValueError:
-                print("Hitpoints should be a positive integer")
+            if not (0 <= x < self.field_size and 0 <= y < self.field_size):
+                print(f"Invalid coordinates\nField size is {self.field_size}x{self.field_size}")
                 return
 
-            self.add_monster(parts[1], x_coord, y_coord, hello_string, hitpoints)
+            if hp <= 0:
+                print("Hitpoints should be a positive integer.")
+                return
+            
+            if (x, y) in self.monsters:
+                print(f"Replaced the old monster at ({x}, {y})")
+            
+            self.monsters[(x, y)] = (name, hello, hp)
+            print(f"Added monster {name} at ({x}, {y}) saying {hello} with {hp} HP")
 
-        else:
-            print("Invalid addmon command")
+        except (ValueError, IndexError) as e:
+            print(f"Error: {e}\n{usage}")
 
     def do_attack(self, arg):
         "Attack a monster: attack [with <weapon>]"
