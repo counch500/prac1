@@ -14,6 +14,7 @@ class MudGame(cmd.Cmd):
         self.monsters = {}
         self.weapons = {"sword": 10, "spear": 15, "axe": 20}
         self.field_size = GRID_SIZE
+        self.available_monsters = ["jgsbat", "cow", "dragon", "goblin"]
     def move_player(self, direction):
         x, y = self.player_position
         if direction == "up":
@@ -92,6 +93,13 @@ class MudGame(cmd.Cmd):
     def complete_move(self, text, line, begidx, endidx):
         return [d for d in ["up", "down", "left", "right"] if d.startswith(text)]
 
+    def complete_addmon(self, text, line, begidx, endidx):
+        "Complete the monster name for addmon command"
+        parts = shlex.split(line[:begidx])
+        if len(parts) == 1:
+            return [m for m in self.available_monsters if m.startswith(text)]
+        return []
+
     def do_addmon(self, arg):
         "Add a monster: addmon <name> coords <x> <y> hello <message> hp <hitpoints>"
         usage = "Usage: addmon <NAME> hello <MESSAGE> hp <HP> coords <X> <Y>"
@@ -105,6 +113,10 @@ class MudGame(cmd.Cmd):
             hello = args[args.index('hello') + 1]
             hp = int(args[args.index('hp') + 1])
             x, y = int(args[args.index('coords') + 1]), int(args[args.index('coords') + 2])
+
+            if name not in self.available_monsters:
+                print(f"Cannot add unknown monster: {name}")
+                return
 
             if not (0 <= x < self.field_size and 0 <= y < self.field_size):
                 print(f"Invalid coordinates\nField size is {self.field_size}x{self.field_size}")
