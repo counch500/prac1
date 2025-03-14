@@ -112,6 +112,10 @@ class MudGame(cmd.Cmd):
     def do_attack(self, arg):
         "Attack a monster: attack [with <weapon>]"
         parts = shlex.split(arg)
+        if not parts:
+            print("Usage: attack <monster_name>")
+            return
+        monster_name = parts[0]
         weapon = "sword" if len(parts) < 2 else parts[1]
 
         if weapon not in self.weapons:
@@ -119,28 +123,25 @@ class MudGame(cmd.Cmd):
             return
 
         x, y = self.player_position
-        if (x, y) not in self.monsters:
-            print("No monster here")
-            return
-
-        name, hello, hp = self.monsters[(x, y)]
-        damage = min(self.weapons[weapon], hp)
-        hp -= damage
-        print(f"Attacked {name} with {weapon}, damage {damage} hp")
-
-        if hp <= 0:
-            print(f"{name} died")
-            del self.monsters[(x, y)]
-        else:
-            print(f"{name} now has {hp} hp")
-            self.monsters[(x, y)] = (name, hello, hp)
+        for (mx, my), (name, hello, hp) in self.monsters.items():
+            if name == monster_name and (mx, my) == (x, y):
+                damage = min(10, hp)
+                hp -= damage
+                print(f"Attacked {name}, damage {damage} hp")
+                if hp <= 0:
+                    print(f"{name} died")
+                    del self.monsters[(mx, my)]
+                else:
+                    print(f"{name} now has {hp} hp")
+                    self.monsters[(mx, my)] = (name, hello, hp)
 
     def complete_attack(self, text, line, begidx, endidx):
         parts = shlex.split(line[:begidx])
-        if len(parts) == 1:
+        if len(parts) ==1:
+            return [m for (x, y), (m, h, hp) in self.monsters.items() if m.startswith(text)]
+        elif len(parts) == 2 and parts[-1] == "with":
             return [w for w in self.weapons if w.startswith(text)]
         return []
-
 
 if __name__ == "__main__":
     print("<<< Welcome to Python-MUD 0.1 >>>")
