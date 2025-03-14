@@ -110,16 +110,23 @@ class MudGame(cmd.Cmd):
             print("Invalid addmon command")
 
     def do_attack(self, arg):
-        "Attack a monster: attack"
+        "Attack a monster: attack [with <weapon>]"
+        parts = shlex.split(arg)
+        weapon = "sword" if len(parts) < 2 else parts[1]
+
+        if weapon not in self.weapons:
+            print("Unknown weapon")
+            return
+
         x, y = self.player_position
         if (x, y) not in self.monsters:
             print("No monster here")
             return
 
         name, hello, hp = self.monsters[(x, y)]
-        damage = min(10, hp)
+        damage = min(self.weapons[weapon], hp)
         hp -= damage
-        print(f"Attacked {name}, damage {damage} hp")
+        print(f"Attacked {name} with {weapon}, damage {damage} hp")
 
         if hp <= 0:
             print(f"{name} died")
@@ -127,6 +134,14 @@ class MudGame(cmd.Cmd):
         else:
             print(f"{name} now has {hp} hp")
             self.monsters[(x, y)] = (name, hello, hp)
+
+    def complete_attack(self, text, line, begidx, endidx):
+        parts = shlex.split(line[:begidx])
+        if len(parts) == 1:
+            return [w for w in self.weapons if w.startswith(text)]
+        return []
+
+
 if __name__ == "__main__":
     print("<<< Welcome to Python-MUD 0.1 >>>")
     MudGame().cmdloop()
