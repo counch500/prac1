@@ -1,0 +1,187 @@
+From cf294ca751a0382b7572d923448c183039582e41 Mon Sep 17 00:00:00 2001
+From: Ksenia Voroshilova <ksenia.sevastopol5@gmail.com>
+Date: Sat, 22 Mar 2025 19:38:28 +0300
+Subject: [PATCH 5/6] corrected
+
+---
+ 20250317/1/client.py | 27 ++++++++++++++++----------
+ 20250317/1/server.py | 45 +++++++++++++++++++++++++++++++-------------
+ 2 files changed, 49 insertions(+), 23 deletions(-)
+
+diff --git a/20250317/1/client.py b/20250317/1/client.py
+index 7e025df..400425d 100644
+--- a/20250317/1/client.py
++++ b/20250317/1/client.py
+@@ -23,23 +23,29 @@ class Client_MUD(cmd.Cmd):
+     host = "localhost"
+     port = 12345
+ 
+-   def __init__(self):
++    def __init__(self):
+         super().__init__()
+         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+         self.s.connect((self.host, self.port))
+ 
+     def send_command(self, command):
++        print(f"Sending: {command}")
+         self.s.sendall(command.encode())
+         return self.s.recv(1024).decode()
++        print(f"Received: {response}")
++        return response
+ 
+     def move(self, arg):
+         "Move the player: move <direction>"
+-        directions = {"up": (0, -1), "down": (0, 1), "left": (-1, 0), "right": (1, 0)}
+-        if arg not in directions:
++        if arg not in ["up", "down", "left", "right"]:
+             print("Invalid direction. Use 'up', 'down', 'left', or 'right'.")
+             return
+-        dx, dy = directions[arg]
+-        response = self.send_command(f"move {dx} {dy}")
++
++        response = self.send_command(f"move {arg}")
++        if not response:
++            print("No response from server.")
++            return
++
+         if "encounter" in response:
+             moved, encounter = response.split("\n")
+             x, y = moved.split()[1:]
+@@ -53,8 +59,7 @@ class Client_MUD(cmd.Cmd):
+             x, y = response.split()[1:]
+             print(f"Moved to ({x}, {y})")
+ 
+-
+-    def addmon(self, name, x, y, hello, hp):
++    def do_addmon(self, arg):
+         "Add a monster: addmon <name> <x> <y> <hello> <hp>"
+         try:
+             name, x, y, hello, hp = shlex.split(arg)
+@@ -67,7 +72,7 @@ class Client_MUD(cmd.Cmd):
+         except ValueError:
+             print("Invalid arguments. Usage: addmon <name> <x> <y> <hello> <hp>")
+ 
+-    def attack(self, name, weapon):
++    def do_attack(self, arg):
+         "Attack a monster: attack <name> [with <weapon>]"
+         parts = shlex.split(arg)
+         if not parts:
+@@ -75,9 +80,11 @@ class Client_MUD(cmd.Cmd):
+             return
+         name = parts[0]
+         weapon = "sword" if len(parts) < 2 else parts[1]
+-        damage = 10 if weapon == "sword" else 15 if weapon == "spear" else 20
+         response = self.send_command(f"attack {name} {damage}")
+-        print(response)
++        if response == "no_monster":
++            print(f"No {name} here")
++        else:
++            print(response)
+ 
+     def do_quit(self, arg):
+         "Exit the game."
+diff --git a/20250317/1/server.py b/20250317/1/server.py
+index 021e365..0ecdee8 100644
+--- a/20250317/1/server.py
++++ b/20250317/1/server.py
+@@ -2,17 +2,26 @@ import asyncio
+ 
+ GRID_SIZE = 10
+ 
+-class MudGame:
++class MudServer:
+     def __init__(self):
+         self.player_position = [0, 0]
+         self.monsters = {}
+         self.weapons = {"sword": 10, "spear": 15, "axe": 20}
++        self.available_monsters = ["jgsbat", "cow", "dragon", "goblin"]
+ 
+-
+-    def move_player(self, dx, dy):
++    def move_player(self, direction):
+         x, y = self.player_position
+-        x = (x + dx) % GRID_SIZE
+-        y = (y + dy) % GRID_SIZE
++        if direction == "up":
++            y = y - 1 if y > 0 else GRID_SIZE - 1
++        elif direction == "down":
++            y = y + 1 if y < GRID_SIZE - 1 else 0
++        elif direction == "left":
++            x = x - 1 if x > 0 else GRID_SIZE - 1
++        elif direction == "right":
++            x = x + 1 if x < GRID_SIZE - 1 else 0
++        else:
++            return "Invalid direction"
++
+         self.player_position = [x, y]
+         if (x, y) in self.monsters:
+             name, hello, hp = self.monsters[(x, y)]
+@@ -20,6 +29,8 @@ class MudGame:
+         return f"moved {x} {y}"
+ 
+     def add_monster(self, name, x, y, hello, hp):
++        if name not in self.available_monsters:
++            return "Cannot add unknown monster"
+         if (x, y) in self.monsters:
+             self.monsters[(x, y)] = (name, hello, hp)
+             return f"added {name} {x} {y} {hello} {hp}\nReplaced the old monster"
+@@ -40,31 +51,37 @@ class MudGame:
+         return f"Attacked {name}, damage {damage} hp\n{name} now has {hp} hp"
+ 
+ async def handle_client(reader, writer):
+-    game = MudGame()
++    game = MudServer()
++    print("New client connected")
+ 
+     while True:
+-        data = await reader.readline()
++        data = await reader.read(100)
+         if not data:
++            print("Client disconnected")
+             break
+ 
+         command = data.decode().strip()
++        print(f"Received: {command}")
++
+         parts = command.split()
+         if not parts:
+             response = "Invalid command"
+-
+         elif parts[0] == "move":
+-            dx, dy = map(int, parts[1:])
+-            response = game.move_player(dx, dy)
+-
++            direction = parts[1]
++            print(f"Moving player: {direction}")
++            response = game.move_player(direction)
+         elif parts[0] == "addmon":
+             name, x, y, hello, hp = parts[1], int(parts[2]), int(parts[3]), parts[4], int(parts[5])
++            print(f"Adding monster: {name} at ({x}, {y})")
+             response = game.add_monster(name, x, y, hello, hp)
+         elif parts[0] == "attack":
+-            name, damage = parts[1], int(parts[2])
+-            response = game.attack_monster(name, damage)
++            name, weapon = parts[1], parts[2]
++            print(f"Attacking {name} with {weapon}")
++            response = game.attack_monster(name, weapon)
+         else:
+             response = "Invalid command"
+ 
++        print(f"Sending: {response}")
+         writer.write(response.encode())
+         await writer.drain()
+ 
+@@ -73,8 +90,10 @@ async def handle_client(reader, writer):
+ 
+ async def main():
+     server = await asyncio.start_server(handle_client, '0.0.0.0', 12345)
++    print("Server started on localhost:12345")
+     async with server:
+         await server.serve_forever()
+ 
+ if __name__ == "__main__":
+     asyncio.run(main())
++
+-- 
+2.34.1
+

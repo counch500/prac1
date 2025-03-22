@@ -1,0 +1,87 @@
+From 4cb23a1bf5cb697e6e3ec69f551a99e238623888 Mon Sep 17 00:00:00 2001
+From: Ksenia Voroshilova <ksenia.sevastopol5@gmail.com>
+Date: Sat, 22 Mar 2025 19:51:30 +0300
+Subject: [PATCH 6/6] corrected1
+
+---
+ 20250317/1/client.py | 13 +++++++------
+ 20250317/1/server.py |  6 +++---
+ 2 files changed, 10 insertions(+), 9 deletions(-)
+
+diff --git a/20250317/1/client.py b/20250317/1/client.py
+index 400425d..36c389f 100644
+--- a/20250317/1/client.py
++++ b/20250317/1/client.py
+@@ -1,7 +1,7 @@
+-import socket
+-import cowsay
+ import cmd
+ import shlex
++import cowsay
++import socket
+ from io import StringIO
+ 
+ cows = cowsay.list_cows() + ['jgsbat']
+@@ -19,7 +19,7 @@ jgsbat = cowsay.read_dot_cow(StringIO(r"""
+ """))
+ 
+ class Client_MUD(cmd.Cmd):
+-    promt = 'MUD> '
++    prompt = 'MUD> '
+     host = "localhost"
+     port = 12345
+ 
+@@ -31,11 +31,11 @@ class Client_MUD(cmd.Cmd):
+     def send_command(self, command):
+         print(f"Sending: {command}")
+         self.s.sendall(command.encode())
+-        return self.s.recv(1024).decode()
++        response = self.s.recv(1024).decode()
+         print(f"Received: {response}")
+         return response
+ 
+-    def move(self, arg):
++    def do_move(self, arg):
+         "Move the player: move <direction>"
+         if arg not in ["up", "down", "left", "right"]:
+             print("Invalid direction. Use 'up', 'down', 'left', or 'right'.")
+@@ -80,7 +80,7 @@ class Client_MUD(cmd.Cmd):
+             return
+         name = parts[0]
+         weapon = "sword" if len(parts) < 2 else parts[1]
+-        response = self.send_command(f"attack {name} {damage}")
++        response = self.send_command(f"attack {name} {weapon}")
+         if response == "no_monster":
+             print(f"No {name} here")
+         else:
+@@ -99,3 +99,4 @@ class Client_MUD(cmd.Cmd):
+ if __name__ == "__main__":
+     print("<<< Welcome to Python-MUD 0.1 >>>")
+     Client_MUD().cmdloop()
++
+diff --git a/20250317/1/server.py b/20250317/1/server.py
+index 0ecdee8..a832615 100644
+--- a/20250317/1/server.py
++++ b/20250317/1/server.py
+@@ -40,15 +40,15 @@ class MudServer:
+     def attack_monster(self, name, weapon):
+         x, y = self.player_position
+         if (x, y) not in self.monsters or self.monsters[(x, y)][0] != name:
+-            return f"No {name} here"
++            return "no_monster"
+         damage = self.weapons.get(weapon, 10)
+         _, hello, hp = self.monsters[(x, y)]
+         hp -= damage
+         if hp <= 0:
+             del self.monsters[(x, y)]
+-            return f"Attacked {name}, damage {damage} hp\n{name} died"
++            return f"attacked {name} {damage} 0\n{name} died"
+         self.monsters[(x, y)] = (name, hello, hp)
+-        return f"Attacked {name}, damage {damage} hp\n{name} now has {hp} hp"
++        return f"attacked {name} {damage} {hp}"
+ 
+ async def handle_client(reader, writer):
+     game = MudServer()
+-- 
+2.34.1
+

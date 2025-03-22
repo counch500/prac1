@@ -1,0 +1,179 @@
+From f5f2ec51f3b2dd9b9ad5c06594e882c81541bfcc Mon Sep 17 00:00:00 2001
+From: Ksenia Voroshilova <ksenia.sevastopol5@gmail.com>
+Date: Sat, 22 Mar 2025 17:09:44 +0300
+Subject: [PATCH 1/6] add first version of client and server
+
+---
+ 20250317/1/Pipfile      | 11 ++++++++
+ 20250317/1/Pipfile.lock | 20 ++++++++++++++
+ 20250317/1/client.py    | 47 +++++++++++++++++++++++++++++++++
+ 20250317/1/server.py    | 58 +++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 136 insertions(+)
+ create mode 100644 20250317/1/Pipfile
+ create mode 100644 20250317/1/Pipfile.lock
+ create mode 100644 20250317/1/client.py
+ create mode 100644 20250317/1/server.py
+
+diff --git a/20250317/1/Pipfile b/20250317/1/Pipfile
+new file mode 100644
+index 0000000..c398b0d
+--- /dev/null
++++ b/20250317/1/Pipfile
+@@ -0,0 +1,11 @@
++[[source]]
++url = "https://pypi.org/simple"
++verify_ssl = true
++name = "pypi"
++
++[packages]
++
++[dev-packages]
++
++[requires]
++python_version = "3.10"
+diff --git a/20250317/1/Pipfile.lock b/20250317/1/Pipfile.lock
+new file mode 100644
+index 0000000..eb6410c
+--- /dev/null
++++ b/20250317/1/Pipfile.lock
+@@ -0,0 +1,20 @@
++{
++    "_meta": {
++        "hash": {
++            "sha256": "fedbd2ab7afd84cf16f128af0619749267b62277b4cb6989ef16d4bef6e4eef2"
++        },
++        "pipfile-spec": 6,
++        "requires": {
++            "python_version": "3.10"
++        },
++        "sources": [
++            {
++                "name": "pypi",
++                "url": "https://pypi.org/simple",
++                "verify_ssl": true
++            }
++        ]
++    },
++    "default": {},
++    "develop": {}
++}
+diff --git a/20250317/1/client.py b/20250317/1/client.py
+new file mode 100644
+index 0000000..40c0f81
+--- /dev/null
++++ b/20250317/1/client.py
+@@ -0,0 +1,47 @@
++import socket
++import cowsay
++
++class MudClient:
++    def __init__(self):
++        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
++        self.sock.connect(('localhost', 12345))
++
++    def send_command(self, command):
++        self.sock.sendall(command.encode())
++        response = self.sock.recv(1024).decode()
++        return response
++
++    def move(self, x, y):
++        response = self.send_command(f"move {x} {y}")
++        if response.startswith("encounter"):
++            _, name, hello = response.split(maxsplit=2)
++            print(cowsay.cowsay(hello, cow=name))
++        else:
++            print(response)
++
++    def addmon(self, name, x, y, hello, hp):
++        response = self.send_command(f"addmon {name} {x} {y} {hello} {hp}")
++        print(response)
++
++    def attack(self, name, weapon):
++        response = self.send_command(f"attack {name} {weapon}")
++        print(response)
++
++def main():
++    client = MudClient()
++    while True:
++        command = input("> ")
++        if command.startswith("move"):
++            _, x, y = command.split()
++            client.move(int(x), int(y))
++        elif command.startswith("addmon"):
++            _, name, x, y, hello, hp = command.split()
++            client.addmon(name, int(x), int(y), hello, int(hp))
++        elif command.startswith("attack"):
++            _, name, weapon = command.split()
++            client.attack(name, weapon)
++        else:
++            print("Invalid command")
++
++if __name__ == "__main__":
++    main()
+diff --git a/20250317/1/server.py b/20250317/1/server.py
+new file mode 100644
+index 0000000..7028961
+--- /dev/null
++++ b/20250317/1/server.py
+@@ -0,0 +1,58 @@
++import socket
++
++class MudServer:
++    def __init__(self):
++        self.player_position = [0, 0]
++        self.monsters = {}
++
++    def handle_command(self, command):
++        parts = command.split()
++        if not parts:
++            return "Invalid command"
++
++        cmd = parts[0]
++        if cmd == "move":
++            x, y = map(int, parts[1:])
++            self.player_position = [x, y]
++            if (x, y) in self.monsters:
++                name, hello, hp = self.monsters[(x, y)]
++                return f"encounter {name} {hello}"
++            return f"moved {x} {y}"
++        elif cmd == "addmon":
++            name, x, y, hello, hp = parts[1], int(parts[2]), int(parts[3]), parts[4], int(parts[5])
++            self.monsters[(x, y)] = (name, hello, hp)
++            return f"added {name} {x} {y} {hello} {hp}"
++        elif cmd == "attack":
++            name, weapon = parts[1], parts[2]
++            x, y = self.player_position
++            if (x, y) in self.monsters and self.monsters[(x, y)][0] == name:
++                _, _, hp = self.monsters[(x, y)]
++                damage = 10 if weapon == "sword" else 15 if weapon == "spear" else 20
++                hp -= damage
++                if hp <= 0:
++                    del self.monsters[(x, y)]
++                    return f"killed {name}"
++                else:
++                    self.monsters[(x, y)] = (name, _, hp)
++                    return f"attacked {name} {damage} {hp}"
++            return f"no_monster {name}"
++        return "Invalid command"
++
++def start_server():
++    server = MudServer()
++    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
++        s.bind(('localhost', 12345))
++        s.listen()
++        print("Server started on localhost:12345")
++        conn, addr = s.accept()
++        with conn:
++            print(f"Connected by {addr}")
++            while True:
++                data = conn.recv(1024).decode()
++                if not data:
++                    break
++                response = server.handle_command(data)
++                conn.sendall(response.encode())
++
++if __name__ == "__main__":
++    start_server()
+-- 
+2.34.1
+

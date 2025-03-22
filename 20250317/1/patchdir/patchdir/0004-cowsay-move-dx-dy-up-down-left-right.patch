@@ -1,0 +1,155 @@
+From 7e82f6b043baebfa47b445e819768c036eb38f4f Mon Sep 17 00:00:00 2001
+From: Ksenia Voroshilova <ksenia.sevastopol5@gmail.com>
+Date: Sat, 22 Mar 2025 18:05:38 +0300
+Subject: [PATCH 4/6] =?UTF-8?q?=D1=82=D0=B5=D0=BF=D0=B5=D1=80=D1=8C=20?=
+ =?UTF-8?q?=D0=BA=D0=BB=D0=B8=D0=B5=D0=BD=D1=82=20=D0=BF=D1=80=D0=BE=D0=B2?=
+ =?UTF-8?q?=D0=B5=D1=80=D1=8F=D0=B5=D1=82=20=D0=BA=D0=BE=D1=80=D1=80=D0=B5?=
+ =?UTF-8?q?=D0=BA=D1=82=D0=BD=D0=BE=D1=81=D1=82=D1=8C=20=D0=BA=D0=BE=D0=BC?=
+ =?UTF-8?q?=D0=B0=D0=BD=D0=B4,=20=D0=A0=D0=B5=D0=BD=D0=B4=D0=B5=D1=80?=
+ =?UTF-8?q?=D0=B8=D1=82=20=D1=8D=D0=BD=D0=BA=D0=B0=D1=83=D0=BD=D1=82=D0=B5?=
+ =?UTF-8?q?=D1=80=D1=8B=20=D1=81=20=D0=BF=D0=BE=D0=BC=D0=BE=D1=89=D1=8C?=
+ =?UTF-8?q?=D1=8E=20cowsay,=20=D0=9A=D0=BE=D0=BC=D0=B0=D0=BD=D0=B4=D1=8B?=
+ =?UTF-8?q?=20=D1=83=D0=BF=D1=80=D0=BE=D1=89=D0=B5=D0=BD=D1=8B=20(=D0=BD?=
+ =?UTF-8?q?=D0=B0=D0=BF=D1=80=D0=B8=D0=BC=D0=B5=D1=80,=20move=20dx=20dy=20?=
+ =?UTF-8?q?=D0=B2=D0=BC=D0=B5=D1=81=D1=82=D0=BE=20up,=20down,=20left,=20ri?=
+ =?UTF-8?q?ght)?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ 20250317/1/client.py | 32 ++++++++++++++++++------------
+ 20250317/1/server.py | 47 +++++++++++++++++---------------------------
+ 2 files changed, 37 insertions(+), 42 deletions(-)
+
+diff --git a/20250317/1/client.py b/20250317/1/client.py
+index da31342..7e025df 100644
+--- a/20250317/1/client.py
++++ b/20250317/1/client.py
+@@ -31,22 +31,28 @@ class Client_MUD(cmd.Cmd):
+     def send_command(self, command):
+         self.s.sendall(command.encode())
+         return self.s.recv(1024).decode()
+-        return response
+ 
+     def move(self, arg):
+-        try:
+-            dx, dy = map(int, arg.split())
+-            response = self.send_command(f"move {dx} {dy}")
+-            if response.startswith("encounter"):
+-                _, name, hello = response.split(maxsplit=2)
+-                if name == "jgsbat":
+-                    print(cowsay.cowsay(hello, cowfile=jgsbat))
+-                else:
+-                    print(cowsay.cowsay(hello, cow=name))
++        "Move the player: move <direction>"
++        directions = {"up": (0, -1), "down": (0, 1), "left": (-1, 0), "right": (1, 0)}
++        if arg not in directions:
++            print("Invalid direction. Use 'up', 'down', 'left', or 'right'.")
++            return
++        dx, dy = directions[arg]
++        response = self.send_command(f"move {dx} {dy}")
++        if "encounter" in response:
++            moved, encounter = response.split("\n")
++            x, y = moved.split()[1:]
++            print(f"Moved to ({x}, {y})")
++            name, hello = encounter.split()[1:]
++            if name == "jgsbat":
++                print(cowsay.cowsay(hello, cowfile=jgsbat))
+             else:
+-                print(response)
+-        except ValueError:
+-            print("Invalid arguments. Usage: move <dx> <dy>")
++                print(cowsay.cowsay(hello, cow=name))
++        else:
++            x, y = response.split()[1:]
++            print(f"Moved to ({x}, {y})")
++
+ 
+     def addmon(self, name, x, y, hello, hp):
+         "Add a monster: addmon <name> <x> <y> <hello> <hp>"
+diff --git a/20250317/1/server.py b/20250317/1/server.py
+index 39a413c..021e365 100644
+--- a/20250317/1/server.py
++++ b/20250317/1/server.py
+@@ -1,42 +1,30 @@
+-import socket
+-import cowsay
++import asyncio
++
++GRID_SIZE = 10
+ 
+ class MudGame:
+     def __init__(self):
+         self.player_position = [0, 0]
+         self.monsters = {}
+         self.weapons = {"sword": 10, "spear": 15, "axe": 20}
+-        self.field_size = GRID_SIZE
+-        self.available_monsters = ["jgsbat", "cow", "dragon", "goblin"]
+ 
+-    def move_player(self, direction):
+-        x, y = self.player_position
+-        if direction == "up":
+-            y = y - 1 if y > 0 else GRID_SIZE - 1
+-        elif direction == "down":
+-            y = y + 1 if y < GRID_SIZE - 1 else 0
+-        elif direction == "left":
+-            x = x - 1 if x > 0 else GRID_SIZE - 1
+-        elif direction == "right":
+-            x = x + 1 if x < GRID_SIZE - 1 else 0
+-        else:
+-            return "Invalid direction"
+ 
+-        self.player_position[0], self.player_position[1] = x, y
+-        response = f"Moved to ({x}, {y})"
++    def move_player(self, dx, dy):
++        x, y = self.player_position
++        x = (x + dx) % GRID_SIZE
++        y = (y + dy) % GRID_SIZE
++        self.player_position = [x, y]
+         if (x, y) in self.monsters:
+             name, hello, hp = self.monsters[(x, y)]
+-            response += f"\nencounter {name} {hello}"
+-        return response
++            return f"moved {x} {y}\nencounter {name} {hello}"
++        return f"moved {x} {y}"
+ 
+     def add_monster(self, name, x, y, hello, hp):
+-        if name not in self.available_monsters:
+-            return "Cannot add unknown monster"
+         if (x, y) in self.monsters:
+             self.monsters[(x, y)] = (name, hello, hp)
+-            return f"Added monster {name} at ({x}, {y}) saying {hello} with {hp} HP\nReplaced the old monster"
++            return f"added {name} {x} {y} {hello} {hp}\nReplaced the old monster"
+         self.monsters[(x, y)] = (name, hello, hp)
+-        return f"Added monster {name} at ({x}, {y}) saying {hello} with {hp} HP"
++        return f"added {name} {x} {y} {hello} {hp}"
+ 
+     def attack_monster(self, name, weapon):
+         x, y = self.player_position
+@@ -63,16 +51,17 @@ async def handle_client(reader, writer):
+         parts = command.split()
+         if not parts:
+             response = "Invalid command"
++
+         elif parts[0] == "move":
+-            direction = parts[1]
+-            response = game.move_player(direction)
++            dx, dy = map(int, parts[1:])
++            response = game.move_player(dx, dy)
++
+         elif parts[0] == "addmon":
+             name, x, y, hello, hp = parts[1], int(parts[2]), int(parts[3]), parts[4], int(parts[5])
+             response = game.add_monster(name, x, y, hello, hp)
+         elif parts[0] == "attack":
+-            name = parts[1]
+-            weapon = parts[3] if len(parts) > 3 else "sword"
+-            response = game.attack_monster(name, weapon)
++            name, damage = parts[1], int(parts[2])
++            response = game.attack_monster(name, damage)
+         else:
+             response = "Invalid command"
+ 
+-- 
+2.34.1
+
