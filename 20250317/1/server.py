@@ -2,17 +2,26 @@ import asyncio
 
 GRID_SIZE = 10
 
-class MudGame:
+class MudServer:
     def __init__(self):
         self.player_position = [0, 0]
         self.monsters = {}
         self.weapons = {"sword": 10, "spear": 15, "axe": 20}
+        self.available_monsters = ["jgsbat", "cow", "dragon", "goblin"]
 
-
-    def move_player(self, dx, dy):
+    def move_player(self, direction):
         x, y = self.player_position
-        x = (x + dx) % GRID_SIZE
-        y = (y + dy) % GRID_SIZE
+        if direction == "up":
+            y = y - 1 if y > 0 else GRID_SIZE - 1
+        elif direction == "down":
+            y = y + 1 if y < GRID_SIZE - 1 else 0
+        elif direction == "left":
+            x = x - 1 if x > 0 else GRID_SIZE - 1
+        elif direction == "right":
+            x = x + 1 if x < GRID_SIZE - 1 else 0
+        else:
+            return "Invalid direction"
+
         self.player_position = [x, y]
         if (x, y) in self.monsters:
             name, hello, hp = self.monsters[(x, y)]
@@ -20,6 +29,8 @@ class MudGame:
         return f"moved {x} {y}"
 
     def add_monster(self, name, x, y, hello, hp):
+        if name not in self.available_monsters:
+            return "Cannot add unknown monster"
         if (x, y) in self.monsters:
             self.monsters[(x, y)] = (name, hello, hp)
             return f"added {name} {x} {y} {hello} {hp}\nReplaced the old monster"
@@ -40,31 +51,37 @@ class MudGame:
         return f"Attacked {name}, damage {damage} hp\n{name} now has {hp} hp"
 
 async def handle_client(reader, writer):
-    game = MudGame()
+    game = MudServer()
+    print("New client connected")
 
     while True:
-        data = await reader.readline()
+        data = await reader.read(100)
         if not data:
+            print("Client disconnected")
             break
 
         command = data.decode().strip()
+        print(f"Received: {command}")
+
         parts = command.split()
         if not parts:
             response = "Invalid command"
-
         elif parts[0] == "move":
-            dx, dy = map(int, parts[1:])
-            response = game.move_player(dx, dy)
-
+            direction = parts[1]
+            print(f"Moving player: {direction}")
+            response = game.move_player(direction)
         elif parts[0] == "addmon":
             name, x, y, hello, hp = parts[1], int(parts[2]), int(parts[3]), parts[4], int(parts[5])
+            print(f"Adding monster: {name} at ({x}, {y})")
             response = game.add_monster(name, x, y, hello, hp)
         elif parts[0] == "attack":
-            name, damage = parts[1], int(parts[2])
-            response = game.attack_monster(name, damage)
+            name, weapon = parts[1], parts[2]
+            print(f"Attacking {name} with {weapon}")
+            response = game.attack_monster(name, weapon)
         else:
             response = "Invalid command"
 
+        print(f"Sending: {response}")
         writer.write(response.encode())
         await writer.drain()
 
@@ -73,8 +90,10 @@ async def handle_client(reader, writer):
 
 async def main():
     server = await asyncio.start_server(handle_client, '0.0.0.0', 12345)
+    print("Server started on localhost:12345")
     async with server:
         await server.serve_forever()
 
 if __name__ == "__main__":
     asyncio.run(main())
+

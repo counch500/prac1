@@ -23,23 +23,29 @@ class Client_MUD(cmd.Cmd):
     host = "localhost"
     port = 12345
 
-   def __init__(self):
+    def __init__(self):
         super().__init__()
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.connect((self.host, self.port))
 
     def send_command(self, command):
+        print(f"Sending: {command}")
         self.s.sendall(command.encode())
         return self.s.recv(1024).decode()
+        print(f"Received: {response}")
+        return response
 
     def move(self, arg):
         "Move the player: move <direction>"
-        directions = {"up": (0, -1), "down": (0, 1), "left": (-1, 0), "right": (1, 0)}
-        if arg not in directions:
+        if arg not in ["up", "down", "left", "right"]:
             print("Invalid direction. Use 'up', 'down', 'left', or 'right'.")
             return
-        dx, dy = directions[arg]
-        response = self.send_command(f"move {dx} {dy}")
+
+        response = self.send_command(f"move {arg}")
+        if not response:
+            print("No response from server.")
+            return
+
         if "encounter" in response:
             moved, encounter = response.split("\n")
             x, y = moved.split()[1:]
@@ -53,8 +59,7 @@ class Client_MUD(cmd.Cmd):
             x, y = response.split()[1:]
             print(f"Moved to ({x}, {y})")
 
-
-    def addmon(self, name, x, y, hello, hp):
+    def do_addmon(self, arg):
         "Add a monster: addmon <name> <x> <y> <hello> <hp>"
         try:
             name, x, y, hello, hp = shlex.split(arg)
@@ -67,7 +72,7 @@ class Client_MUD(cmd.Cmd):
         except ValueError:
             print("Invalid arguments. Usage: addmon <name> <x> <y> <hello> <hp>")
 
-    def attack(self, name, weapon):
+    def do_attack(self, arg):
         "Attack a monster: attack <name> [with <weapon>]"
         parts = shlex.split(arg)
         if not parts:
@@ -75,9 +80,11 @@ class Client_MUD(cmd.Cmd):
             return
         name = parts[0]
         weapon = "sword" if len(parts) < 2 else parts[1]
-        damage = 10 if weapon == "sword" else 15 if weapon == "spear" else 20
         response = self.send_command(f"attack {name} {damage}")
-        print(response)
+        if response == "no_monster":
+            print(f"No {name} here")
+        else:
+            print(response)
 
     def do_quit(self, arg):
         "Exit the game."
