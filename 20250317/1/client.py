@@ -31,22 +31,28 @@ class Client_MUD(cmd.Cmd):
     def send_command(self, command):
         self.s.sendall(command.encode())
         return self.s.recv(1024).decode()
-        return response
 
     def move(self, arg):
-        try:
-            dx, dy = map(int, arg.split())
-            response = self.send_command(f"move {dx} {dy}")
-            if response.startswith("encounter"):
-                _, name, hello = response.split(maxsplit=2)
-                if name == "jgsbat":
-                    print(cowsay.cowsay(hello, cowfile=jgsbat))
-                else:
-                    print(cowsay.cowsay(hello, cow=name))
+        "Move the player: move <direction>"
+        directions = {"up": (0, -1), "down": (0, 1), "left": (-1, 0), "right": (1, 0)}
+        if arg not in directions:
+            print("Invalid direction. Use 'up', 'down', 'left', or 'right'.")
+            return
+        dx, dy = directions[arg]
+        response = self.send_command(f"move {dx} {dy}")
+        if "encounter" in response:
+            moved, encounter = response.split("\n")
+            x, y = moved.split()[1:]
+            print(f"Moved to ({x}, {y})")
+            name, hello = encounter.split()[1:]
+            if name == "jgsbat":
+                print(cowsay.cowsay(hello, cowfile=jgsbat))
             else:
-                print(response)
-        except ValueError:
-            print("Invalid arguments. Usage: move <dx> <dy>")
+                print(cowsay.cowsay(hello, cow=name))
+        else:
+            x, y = response.split()[1:]
+            print(f"Moved to ({x}, {y})")
+
 
     def addmon(self, name, x, y, hello, hp):
         "Add a monster: addmon <name> <x> <y> <hello> <hp>"

@@ -1,42 +1,30 @@
-import socket
-import cowsay
+import asyncio
+
+GRID_SIZE = 10
 
 class MudGame:
     def __init__(self):
         self.player_position = [0, 0]
         self.monsters = {}
         self.weapons = {"sword": 10, "spear": 15, "axe": 20}
-        self.field_size = GRID_SIZE
-        self.available_monsters = ["jgsbat", "cow", "dragon", "goblin"]
 
-    def move_player(self, direction):
+
+    def move_player(self, dx, dy):
         x, y = self.player_position
-        if direction == "up":
-            y = y - 1 if y > 0 else GRID_SIZE - 1
-        elif direction == "down":
-            y = y + 1 if y < GRID_SIZE - 1 else 0
-        elif direction == "left":
-            x = x - 1 if x > 0 else GRID_SIZE - 1
-        elif direction == "right":
-            x = x + 1 if x < GRID_SIZE - 1 else 0
-        else:
-            return "Invalid direction"
-
-        self.player_position[0], self.player_position[1] = x, y
-        response = f"Moved to ({x}, {y})"
+        x = (x + dx) % GRID_SIZE
+        y = (y + dy) % GRID_SIZE
+        self.player_position = [x, y]
         if (x, y) in self.monsters:
             name, hello, hp = self.monsters[(x, y)]
-            response += f"\nencounter {name} {hello}"
-        return response
+            return f"moved {x} {y}\nencounter {name} {hello}"
+        return f"moved {x} {y}"
 
     def add_monster(self, name, x, y, hello, hp):
-        if name not in self.available_monsters:
-            return "Cannot add unknown monster"
         if (x, y) in self.monsters:
             self.monsters[(x, y)] = (name, hello, hp)
-            return f"Added monster {name} at ({x}, {y}) saying {hello} with {hp} HP\nReplaced the old monster"
+            return f"added {name} {x} {y} {hello} {hp}\nReplaced the old monster"
         self.monsters[(x, y)] = (name, hello, hp)
-        return f"Added monster {name} at ({x}, {y}) saying {hello} with {hp} HP"
+        return f"added {name} {x} {y} {hello} {hp}"
 
     def attack_monster(self, name, weapon):
         x, y = self.player_position
@@ -63,16 +51,17 @@ async def handle_client(reader, writer):
         parts = command.split()
         if not parts:
             response = "Invalid command"
+
         elif parts[0] == "move":
-            direction = parts[1]
-            response = game.move_player(direction)
+            dx, dy = map(int, parts[1:])
+            response = game.move_player(dx, dy)
+
         elif parts[0] == "addmon":
             name, x, y, hello, hp = parts[1], int(parts[2]), int(parts[3]), parts[4], int(parts[5])
             response = game.add_monster(name, x, y, hello, hp)
         elif parts[0] == "attack":
-            name = parts[1]
-            weapon = parts[3] if len(parts) > 3 else "sword"
-            response = game.attack_monster(name, weapon)
+            name, damage = parts[1], int(parts[2])
+            response = game.attack_monster(name, damage)
         else:
             response = "Invalid command"
 
