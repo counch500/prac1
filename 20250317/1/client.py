@@ -1,7 +1,7 @@
-import socket
-import cowsay
 import cmd
 import shlex
+import cowsay
+import socket
 from io import StringIO
 
 cows = cowsay.list_cows() + ['jgsbat']
@@ -19,7 +19,7 @@ jgsbat = cowsay.read_dot_cow(StringIO(r"""
 """))
 
 class Client_MUD(cmd.Cmd):
-    promt = 'MUD> '
+    prompt = 'MUD> '
     host = "localhost"
     port = 12345
 
@@ -31,11 +31,11 @@ class Client_MUD(cmd.Cmd):
     def send_command(self, command):
         print(f"Sending: {command}")
         self.s.sendall(command.encode())
-        return self.s.recv(1024).decode()
+        response = self.s.recv(1024).decode()
         print(f"Received: {response}")
         return response
 
-    def move(self, arg):
+    def do_move(self, arg):
         "Move the player: move <direction>"
         if arg not in ["up", "down", "left", "right"]:
             print("Invalid direction. Use 'up', 'down', 'left', or 'right'.")
@@ -80,7 +80,7 @@ class Client_MUD(cmd.Cmd):
             return
         name = parts[0]
         weapon = "sword" if len(parts) < 2 else parts[1]
-        response = self.send_command(f"attack {name} {damage}")
+        response = self.send_command(f"attack {name} {weapon}")
         if response == "no_monster":
             print(f"No {name} here")
         else:
@@ -99,3 +99,4 @@ class Client_MUD(cmd.Cmd):
 if __name__ == "__main__":
     print("<<< Welcome to Python-MUD 0.1 >>>")
     Client_MUD().cmdloop()
+

@@ -40,15 +40,15 @@ class MudServer:
     def attack_monster(self, name, weapon):
         x, y = self.player_position
         if (x, y) not in self.monsters or self.monsters[(x, y)][0] != name:
-            return f"No {name} here"
+            return "no_monster"
         damage = self.weapons.get(weapon, 10)
         _, hello, hp = self.monsters[(x, y)]
         hp -= damage
         if hp <= 0:
             del self.monsters[(x, y)]
-            return f"Attacked {name}, damage {damage} hp\n{name} died"
+            return f"attacked {name} {damage} 0\n{name} died"
         self.monsters[(x, y)] = (name, hello, hp)
-        return f"Attacked {name}, damage {damage} hp\n{name} now has {hp} hp"
+        return f"attacked {name} {damage} {hp}"
 
 async def handle_client(reader, writer):
     game = MudServer()
