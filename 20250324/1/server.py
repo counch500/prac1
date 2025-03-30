@@ -36,40 +36,6 @@ class MUD:
             return cowsay.cowsay(hello, cow=name)
         return ''
 
-    def moving(self, d_x, d_y):
-        new_position = self.move_player(d_x, d_y)
-        encounter_message = self.encounter(self.player_position[0], self.player_position[1])
-        if encounter_message:
-            return f"Moved to ({new_position})\n{encounter_message}"
-        return f"Moved to ({new_position})"
-
-    def add_monster(self, x, y, hp, hello, name):
-        if name not in cowsay.list_cows() and name != "jgsbat":
-            return "cannot add unknown monster"
-        if (x, y) == self.player_position:
-            return "cannot add monster to player's position"
-        old_mon = game_field[x][y] is not None
-        game_field[x][y] = (name, hello, hp)
-        monsters.add(name)
-        return "1" if old_mon else "0"
-
-    def attack(self, weapon, name):
-        if name not in monsters:
-            return f'no such monster {name}'
-        x, y = self.player_position
-        monster = game_field[x][y]
-        if not monster or monster[0] != name:
-            return f'no {name} here'
-        name, hello, hp = monster
-        damage = min(self.weapons[weapon], hp)
-        hp -= damage
-        if hp <= 0:
-            game_field[x][y] = None
-            monsters.remove(name)
-            return f'{damage} 0'
-        game_field[x][y] = (name, hello, hp)
-        return f'{damage} {hp}'
-
 async def broadcast_message(message, exclude=None):
     for username, queue in clients.items():
         if username != exclude:
@@ -77,6 +43,13 @@ async def broadcast_message(message, exclude=None):
 
 async def handle_client(reader, writer):
     username = (await reader.readline()).decode().strip()
+
+    if ' ' in username:
+        writer.write(b"Username cannot contain spaces\n")
+        await writer.drain()
+        writer.close()
+        await writer.wait_closed()
+        return
 
     if username in clients:
         writer.write(b"Username already taken\n")
@@ -92,7 +65,7 @@ async def handle_client(reader, writer):
     await writer.drain()
 
     await broadcast_message(f"{username} has joined the game", exclude=username)
-    print(f"{username} connected")
+    print(f"[SERVER] {username} подключился (позиция: {games[username].player_position})")
 
     send_task = asyncio.create_task(send_messages(writer, username))
 
@@ -130,6 +103,10 @@ async def handle_client(reader, writer):
                     game_field[x][y] = (name, hello, hp)
                     monsters.add(name)
                     
+                    print(f"[SERVER] {username} добавил {name} в ({x},{y}) с {hp} HP")
+                    if old_mon:
+                        print(f"[SERVER] Заменил старого монстра в ({x},{y})")
+
                     message = f"{username} added monster {name} to ({x}, {y}) with {hp} hp"
                     if old_mon:
                         message += "\nReplaced the old monster"
@@ -160,9 +137,11 @@ async def handle_client(reader, writer):
                     if hp <= 0:
                         game_field[x][y] = None
                         monsters.remove(name)
+                        print(f"[SERVER] {username} убил {name} в ({x},{y})")
                         await broadcast_message(f"{username} attacked {name} with {weapon} for {damage} hp, {name} died")
                     else:
                         game_field[x][y] = (name, hello, hp)
+                        print(f"[SERVER] {username} атаковал {name} в ({x},{y}), осталось {hp} HP")
                         await broadcast_message(f"{username} attacked {name} with {weapon} for {damage} hp, {name} has {hp} hp left")
                 except (ValueError, IndexError):
                     await clients[username].put("Invalid arguments")
@@ -170,7 +149,10 @@ async def handle_client(reader, writer):
             elif cmd == "move":
                 try:
                     d_x, d_y = map(int, parts[1:3])
+                    old_x, old_y = game.player_position
                     new_position = game.move_player(d_x, d_y)
+                    print(f"[SERVER] {username} переместился с ({old_x},{old_y}) на {game.player_position}")
+                    
                     encounter_message = game.encounter(game.player_position[0], game.player_position[1])
                     if encounter_message:
                         await clients[username].put(f"Moved to ({new_position})\n{encounter_message}")
@@ -183,7 +165,7 @@ async def handle_client(reader, writer):
                 await clients[username].put("Unknown command")
 
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error with {username}: {e}")
     finally:
         send_task.cancel()
         try:
@@ -197,10 +179,10 @@ async def handle_client(reader, writer):
             del games[username]
 
         await broadcast_message(f"{username} has left the game", exclude=username)
+        print(f"[SERVER] {username} отключился")
 
         writer.close()
         await writer.wait_closed()
-        print(f"{username} disconnected")
 
 async def send_messages(writer, username):
     try:
@@ -213,6 +195,8 @@ async def send_messages(writer, username):
 
 async def main():
     server = await asyncio.start_server(handle_client, '0.0.0.0', 1337)
+    addr = server.sockets[0].getsockname()
+    print(f"[SERVER] Запущен на {addr[0]}:{addr[1]}")
     async with server:
         await server.serve_forever()
 
