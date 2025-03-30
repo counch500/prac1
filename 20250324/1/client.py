@@ -121,6 +121,16 @@ class MUDClient(cmd.Cmd):
                 print("\nConnection lost. Exiting...")
                 return True
 
+    def do_quit(self, args):
+        "Exit the game."
+        print("Goodbye!")
+        self.socket.close()
+        return True
+
+    def do_exit(self, args):
+        "Exit the game."
+        return self.do_quit(arg)
+
     def default(self, args):
         print("Invalid command")
 
