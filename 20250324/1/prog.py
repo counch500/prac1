@@ -17,15 +17,76 @@ class MUD(cmd.Cmd):
         self.jgsbat_func = None
         try:
             with open("jgsbat.cow", "r", encoding="utf-8") as f:
-                jgsbat_template = cowsay.read_dot_cow(f)
+                jgsbat_template = cowsay.read_dot_cow(f) #шаблон ackii-арта
                 self.jgsbat_func = lambda msg: cowsay.cowsay(msg, cowfile=jgsbat_template)
         except Exception as e:
             print(f"Ошибка загрузки монстра jgsbat: {e}")
 
-    def complete_addmon(self, text, line, begidx, endidx):
-        """Автодополнение монстров в команде addmon"""
-        monsters = cowsay.list_cows() + ["jgsbat"]
-        return [m for m in monsters if m.startswith(text)]
+    def do_up(self, arg):
+        """Двигает игрока вверх"""
+        self.move_player("up")
+
+    def do_down(self, arg):
+        """Двигает игрока вниз"""
+        self.move_player("down")
+
+    def do_left(self, arg):
+        """Двигает игрока влево"""
+        self.move_player("left")
+
+    def do_right(self, arg):
+        """Двигает игрока вправо"""
+        self.move_player("right")
+
+    def move_player(self, direction):
+        x, y = self.player_position
+        if direction == 'up':
+            y = (y - 1) % 10
+        elif direction == 'down':
+            y = (y + 1) % 10
+        elif direction == 'left':
+            x = (x - 1) % 10
+        elif direction == 'right':
+            x = (x + 1) % 10
+        else:
+            print("Invalid command")
+            return
+
+        self.player_position = (x, y)
+        print(f"Moved to ({x}, {y})")
+        self.encounter(x, y)
+
+    def do_attack(self, arg):
+        """Атаковать монстра в текущей позиции"""
+        parts = arg.split()
+        if len(parts) == 0:
+            print("attack name witn weapon")
+            return
+        if len(parts) == 3 and parts[1] == "with":
+            monster_name, weapon = parts[0], parts[2]
+        elif len(parts) == 1:
+            monster_name, weapon = parts[0], "sword"
+        else:
+            print("Usage: attack <monster_name> with <weapon>")
+            return
+        if weapon not in self.weapons:
+            print("Unknown weapon")
+            return
+        x, y = self.player_position
+        monster = self.field[x][y]
+        if not monster or monster[0] != monster_name:
+            print(f"No {monster_name} here")
+            return
+        name, hello, hp = monster
+        damage = min(self.weapons[weapon], hp)
+        hp -= damage
+        print(f"Attacked {name} with {weapon}, damage {damage} hp")
+        if hp <= 0:
+            print(f"{name} died")
+            self.field[x][y] = None 
+        else:
+            print(f"{name} now has {hp} hp")
+            self.field[x][y] = (name, hello, hp)
 
     def complete_attack(self, text, line, begidx, endidx):
         """Автодополнение attack по именам доступных монстров"""
@@ -63,77 +124,11 @@ class MUD(cmd.Cmd):
                 print("hitpoints must be positive")
                 return
 
-            self.place_monster(name, x, y, hello, hp)
+            self.add_monster(name, x, y, hello, hp)
         except (ValueError, KeyError):
             print("Invalid arguments")
 
-    def do_attack(self, arg):
-        """Атаковать монстра в текущей позиции"""
-        parts = arg.split()
-        if len(parts) == 0:
-            print("attack name witn weapon")
-            return
-        if len(parts) == 3 and parts[1] == "with":
-            monster_name, weapon = parts[0], parts[2]
-        elif len(parts) == 1:
-            monster_name, weapon = parts[0], "sword"
-        else:
-            print("Usage: attack <monster_name> with <weapon>")
-            return
-        if weapon not in self.weapons:
-            print("Unknown weapon")
-            return
-        x, y = self.player_position
-        monster = self.field[x][y]
-        if not monster or monster[0] != monster_name:
-            print(f"No {monster_name} here")
-            return
-        name, hello, hp = monster
-        damage = min(self.weapons[weapon], hp)
-        hp -= damage
-        print(f"Attacked {name} with {weapon}, damage {damage} hp")
-        if hp <= 0:
-            print(f"{name} died")
-            self.field[x][y] = None 
-        else:
-            print(f"{name} now has {hp} hp")
-            self.field[x][y] = (name, hello, hp)
-
-    def do_down(self, arg):
-        """Двигает игрока вниз"""
-        self.change_position("down")
-
-    def do_left(self, arg):
-        """Двигает игрока влево"""
-        self.change_position("left")
-
-    def do_right(self, arg):
-        """Двигает игрока вправо"""
-        self.change_position("right")
-
-    def do_up(self, arg):
-        """Двигает игрока вверх"""
-        self.change_position("up")
-
-    def change_position(self, direction):
-        x, y = self.player_position
-        if direction == 'up':
-            y = (y - 1) % 10
-        elif direction == 'down':
-            y = (y + 1) % 10
-        elif direction == 'left':
-            x = (x - 1) % 10
-        elif direction == 'right':
-            x = (x + 1) % 10
-        else:
-            print("Invalid command")
-            return
-
-        self.player_position = (x, y)
-        print(f"Moved to ({x}, {y})")
-        self.monster_meeting(x, y)
-
-    def place_monster(self, name, x, y, hello, hp):
+    def add_monster(self, name, x, y, hello, hp):
         if name not in cowsay.list_cows() and name != "jgsbat":
             print("cannot add unknown monster")
             return
@@ -148,7 +143,7 @@ class MUD(cmd.Cmd):
         if old_mon:
             print("Replaced the old monster")
 
-    def monster_meeting(self, x, y):
+    def encounter(self, x, y):
         monster = self.field[x][y]
         if monster is not None:
             name, hello, _ = monster
@@ -157,9 +152,15 @@ class MUD(cmd.Cmd):
             else:
                 print(cowsay.cowsay(hello, cow=name))
 
+    def complete_addmon(self, text, line, begidx, endidx):
+        """Автодополнение монстров в команде addmon"""
+        monsters = cowsay.list_cows() + ["jgsbat"]
+        return [m for m in monsters if m.startswith(text)]
+
     def do_EOF():
         return 1
 
 if __name__ == "__main__":
     game = MUD()
     game.cmdloop()
+
