@@ -160,6 +160,21 @@ async def handle_client(reader, writer):
                         await clients[username].put(f"Moved to ({new_position})")
                 except (ValueError, IndexError):
                     await clients[username].put("Invalid arguments")
+            elif cmd == "sayall":
+                if len(parts) < 2:
+                    await clients[username].put("Invalid arguments")
+                    continue
+                 
+                try:
+                    parsed = shlex.split(message)
+                    if len(parsed) < 2:
+                        await clients[username].put("Invalid arguments")
+                        continue
+                     
+                    msg_to_broadcast = ' '.join(parsed[1:])
+                    await broadcast_message(f"{username}: {msg_to_broadcast}")
+                except ValueError:
+                    await clients[username].put("Invalid arguments")
 
             else:
                 await clients[username].put("Unknown command")

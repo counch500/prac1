@@ -50,7 +50,17 @@ class Client_MUD(cmd.Cmd):
         except ConnectionError:
             print("Не удалось подключиться к серверу")
             return True
-
+    def do_sayall(self, args):
+        """Send a message to all players. Usage: sayall <message> or sayall "message with spaces" """
+        if not args:
+            print("Invalid arguments")
+            return
+        try:
+            self.s.sendall(f"sayall {args}\n".encode())
+        except ConnectionError:
+            print("\nConnection lost. Exiting...")
+            return True
+ 
     def receive_messages(self):
         while True:
             try:
