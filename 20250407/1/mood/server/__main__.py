@@ -2,6 +2,7 @@
 Server module for MOOD MUD game.
 """
 
+import random
 import asyncio
 import cowsay
 import shlex
@@ -79,6 +80,55 @@ class MUD:
         game_field[x][y] = (name, hello, hp)
         return f'{damage} {hp}'
 
+async def wander_monsters():
+    while True:
+        await asyncio.sleep(30)
+        if not monsters:
+            continue
+
+        moved = False
+        attempts = 0
+        max_attempts = 100
+            
+        while not moved and attempts < max_attempts:
+            attempts += 1
+            name = random.choice(list(monsters))
+            positions = []
+            for x in range(10):
+                for y in range(10):
+                    if game_field[x][y] and game_field[x][y][0] == name:
+                        positions.append((x, y))
+            
+            if not positions:
+                continue
+                
+            x, y = random.choice(positions)
+            direction = random.choice(['up', 'down', 'left', 'right'])
+            
+            new_x, new_y = x, y
+            if direction == 'up':
+                new_y = (y - 1) % 10
+            elif direction == 'down':
+                new_y = (y + 1) % 10
+            elif direction == 'left':
+                new_x = (x - 1) % 10
+            elif direction == 'right':
+                new_x = (x + 1) % 10
+                
+            if game_field[new_x][new_y] is None:
+                monster = game_field[x][y]
+                game_field[x][y] = None
+                game_field[new_x][new_y] = monster
+                moved = True
+
+                message = f"{name} moved one cell {direction}"
+                await broadcast_message(f"[SERVER] {message}")
+
+                for username, game in games.items():
+                    if game.player_position == (new_x, new_y):
+                        encounter_msg = game.encounter(new_x, new_y)
+                        if encounter_msg:
+                            await clients[username].put(encounter_msg)
 
 async def broadcast_message(message, exclude=None):
     for username, queue in clients.items():
@@ -240,6 +290,9 @@ async def main():
     server = await asyncio.start_server(handle_client, '0.0.0.0', 1337)
     addr = server.sockets[0].getsockname()
     print(f"[SERVER] Запущен на {addr[0]}:{addr[1]}")
+    
+    asyncio.create_task(wander_monsters())
+    
     async with server:
         await server.serve_forever()
 
