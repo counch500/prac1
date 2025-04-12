@@ -17,7 +17,21 @@ monsters = set()
 
 
 class MUD:
+    """Main MUD game class handling player actions and game state.
+    
+    Attributes:
+        player_position (tuple): Current player position (x, y)
+        weapons (dict): Available weapons and their damage values
+        username (str): Player's username
+        jgsbat_func (function): Custom cow function for jgsbat monster
+    """
+    
     def __init__(self, username):
+        """Initialize MUD instance for a player.
+        
+        Args:
+            username (str): Player's username
+        """
         self.player_position = (0, 0)
         self.weapons = {"sword": 10, "spear": 15, "axe": 20}
         self.username = username
@@ -30,6 +44,15 @@ class MUD:
             print(f"Ошибка загрузки монстра jgsbat: {e}")
 
     def move_player(self, d_x, d_y):
+        """Move player by delta coordinates.
+        
+        Args:
+            d_x (int): X coordinate delta
+            d_y (int): Y coordinate delta
+            
+        Returns:
+            str: New position as "x y"
+        """
         x, y = self.player_position
         x = (x + d_x) % 10
         y = (y + d_y) % 10
@@ -37,6 +60,15 @@ class MUD:
         return f"{x} {y}"
 
     def encounter(self, x, y):
+        """Handle monster encounter at specified coordinates.
+
+        Args:
+            x (int): X coordinate to check
+            y (int): Y coordinate to check
+
+        Returns:
+            str: Formatted encounter message or empty string if no monster
+        """
         monster = game_field[x][y]
         if monster:
             name, hello, _ = monster
@@ -46,6 +78,15 @@ class MUD:
         return ''
 
     def moving(self, d_x, d_y):
+        """Move player and handle potential encounters.
+
+        Args:
+            d_x (int): X direction delta
+            d_y (int): Y direction delta
+
+        Returns:
+            str: Move result with optional encounter message
+        """
         new_position = self.move_player(d_x, d_y)
         encounter_message = self.encounter(self.player_position[0], self.player_position[1])
         if encounter_message:
@@ -53,6 +94,19 @@ class MUD:
         return f"Moved to ({new_position})"
 
     def add_monster(self, x, y, hp, hello, name):
+        """Add monster to game field.
+
+        Args:
+            x (int): X coordinate (0-9)
+            y (int): Y coordinate (0-9)
+            hp (int): Hit points (positive integer)
+            hello (str): Greeting message
+            name (str): Monster name
+
+        Returns:
+            str: "1" if replaced existing monster, "0" otherwise
+                 or error message
+        """
         if name not in cowsay.list_cows() and name != "jgsbat":
             return "cannot add unknown monster"
         if (x, y) == self.player_position:
@@ -64,6 +118,16 @@ class MUD:
         return "1" if old_mon else "0"
 
     def attack(self, weapon, name):
+        """Attack monster with specified weapon.
+
+        Args:
+            weapon (str): Weapon name (sword/spear/axe)
+            name (str): Monster name
+
+        Returns:
+            str: Attack result formatted as "damage remaining_hp"
+                 or error message
+        """
         if name not in monsters:
             return f'no such monster {name}'
         x, y = self.player_position
@@ -81,6 +145,7 @@ class MUD:
         return f'{damage} {hp}'
 
 async def wander_monsters():
+    """Periodically move monsters around the game field."""
     while True:
         await asyncio.sleep(30)
         if not monsters:
@@ -131,12 +196,24 @@ async def wander_monsters():
                             await clients[username].put(encounter_msg)
 
 async def broadcast_message(message, exclude=None):
+    """Send message to all connected clients.
+
+    Args:
+        message (str): Message to broadcast
+        exclude (str, optional): Username to exclude from broadcast
+    """
     for username, queue in clients.items():
         if username != exclude:
             await queue.put(message)
 
 
 async def handle_client(reader, writer):
+    """Handle incoming client connection.
+
+    Args:
+        reader: asyncio StreamReader
+        writer: asyncio StreamWriter
+    """
     username = (await reader.readline()).decode().strip()
 
     if username in clients:
@@ -172,6 +249,7 @@ async def handle_client(reader, writer):
             game = games[username]
 
             if cmd == "addmon":
+                """Handle addmon command: addmon name x y hp hello"""
                 try:
                     name, x, y, hp = parts[1:5]
                     hello = ' '.join(parts[5:])
@@ -197,6 +275,7 @@ async def handle_client(reader, writer):
                     await clients[username].put("Invalid arguments")
 
             elif cmd == "attack":
+                """Handle attack command: attack weapon name"""
                 try:
                     weapon, name = parts[1:3]
                     if weapon not in ["sword", "spear", "axe"]:
@@ -227,6 +306,7 @@ async def handle_client(reader, writer):
                     await clients[username].put("Invalid arguments")
 
             elif cmd == "move":
+                """Handle move command: move dx dy"""
                 try:
                     d_x, d_y = map(int, parts[1:3])
                     new_position = game.move_player(d_x, d_y)
@@ -239,6 +319,7 @@ async def handle_client(reader, writer):
                     await clients[username].put("Invalid arguments")
 
             elif cmd == "sayall":
+                """Handle sayall command: sayall message"""
                 if len(parts) < 2:
                     await clients[username].put("Invalid arguments")
                     continue
@@ -277,6 +358,12 @@ async def handle_client(reader, writer):
 
 
 async def send_messages(writer, username):
+    """Send messages from queue to client.
+
+    Args:
+        writer: asyncio StreamWriter
+        username (str): Recipient username
+    """
     try:
         while True:
             message = await clients[username].get()
@@ -287,6 +374,7 @@ async def send_messages(writer, username):
 
 
 async def main():
+    """Main server entry point."""
     server = await asyncio.start_server(handle_client, '0.0.0.0', 1337)
     addr = server.sockets[0].getsockname()
     print(f"[SERVER] Запущен на {addr[0]}:{addr[1]}")
