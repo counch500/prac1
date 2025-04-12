@@ -149,8 +149,9 @@ async def wander_monsters():
     while True:
         await asyncio.sleep(30)
         if not monsters:
+            print("[SERVER] Нет монстров для перемещения")
             continue
-
+            
         moved = False
         attempts = 0
         max_attempts = 100
@@ -185,10 +186,14 @@ async def wander_monsters():
                 game_field[x][y] = None
                 game_field[new_x][new_y] = monster
                 moved = True
-
-                message = f"{name} moved one cell {direction}"
-                await broadcast_message(f"[SERVER] {message}")
-
+                
+                # Логирование на сервере
+                print(f"[SERVER] Монстр {name} переместился с ({x},{y}) на ({new_x},{new_y})")
+                
+                # Уведомление всех клиентов
+                await broadcast_message(f"[SERVER] {name} переместился на {direction} в ({new_x},{new_y})")
+                
+                # Проверка встречи с игроками
                 for username, game in games.items():
                     if game.player_position == (new_x, new_y):
                         encounter_msg = game.encounter(new_x, new_y)
