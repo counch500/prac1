@@ -4,8 +4,8 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-python-cowsay = "*"
 sphinx = "*"
+python-cowsay = "*"
 
 [dev-packages]
 
