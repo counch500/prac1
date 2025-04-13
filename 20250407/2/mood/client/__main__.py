@@ -276,8 +276,14 @@ def parse_args(args, param):
 if __name__ == '__main__':
     print("<<< Welcome to Python-MUD 0.1 >>>")
     if len(sys.argv) < 2:
-        print("Usage: python client.py <username>")
+        print("Usage: python client.py <username> [--file <script.mood>]")
         sys.exit(1)
 
     username = sys.argv[1]
-    Client_MUD(username).cmdloop()
+    script_file = None
+    
+    # Обрабатываем аргумент --file
+    if len(sys.argv) > 3 and sys.argv[2] == '--file':
+        script_file = sys.argv[3]
+    
+    Client_MUD(username, script_file).cmdloop()
