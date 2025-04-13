@@ -377,6 +377,7 @@ async def send_messages(writer, username):
     except asyncio.CancelledError:
         pass
 
+WANDERING_MONSTERS_ENABLED = False 
 
 async def main():
     """Main server entry point."""
@@ -384,7 +385,8 @@ async def main():
     addr = server.sockets[0].getsockname()
     print(f"[SERVER] Запущен на {addr[0]}:{addr[1]}")
     
-    asyncio.create_task(wander_monsters())
+    if WANDERING_MONSTERS_ENABLED:
+        asyncio.create_task(wander_monsters())
     
     async with server:
         await server.serve_forever()
