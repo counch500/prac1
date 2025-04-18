@@ -11,7 +11,6 @@ import shlex
 clients = {}  
 games = {}  
 
-# Глобальные переменные для хранения общего состояния игры
 game_field = [[None for _ in range(10)] for _ in range(10)]
 monsters = set()
 wandering_monsters_enabled = True 
@@ -41,7 +40,7 @@ class MUD:
                 jgsbat_template = cowsay.read_dot_cow(f)
                 self.jgsbat_func = lambda msg: cowsay.cowsay(msg, cowfile=jgsbat_template)
         except Exception as e:
-            print(f"Ошибка загрузки монстра jgsbat: {e}")
+            print(f"Failed to add jgsbat: {e}")
 
     def move_player(self, d_x, d_y):
         """Move player by delta coordinates.
@@ -149,10 +148,10 @@ async def wander_monsters():
     global wandering_monsters_enabled
     while True:
         await asyncio.sleep(30)
-        if not wandering_monsters_enabled:  # Проверяем флаг
+        if not wandering_monsters_enabled:
             continue
         if not monsters:
-            print("[SERVER] Нет монстров для перемещения")
+            print("[SERVER] No monsters to move")
             continue
 
         moved = False
@@ -191,10 +190,10 @@ async def wander_monsters():
                 moved = True
                 
                 # Логирование на сервере
-                print(f"[SERVER] Монстр {name} переместился с ({x},{y}) на ({new_x},{new_y})")
+                print(f"[SERVER] Monster {name} moved from ({x},{y}) to ({new_x},{new_y})")
                 
                 # Уведомление всех клиентов
-                await broadcast_message(f"[SERVER] {name} переместился на {direction} в ({new_x},{new_y})")
+                await broadcast_message(f"[SERVER] {name} moved by {direction} to ({new_x},{new_y})")
                 
                 # Проверка встречи с игроками
                 for username, game in games.items():
@@ -305,7 +304,7 @@ async def handle_client(reader, writer):
                     if hp <= 0:
                         game_field[x][y] = None
                         monsters.remove(name)
-                        print(f"[SERVER] {username} убил {name} в ({x},{y})")
+                        print(f"[SERVER] {username} murdered {name} at ({x},{y})")
                         await broadcast_message(f"{username} attacked {name} with {weapon} for {damage} hp, {name} died")
                     else:
                         game_field[x][y] = (name, hello, hp)
@@ -341,24 +340,30 @@ async def handle_client(reader, writer):
                 except ValueError:
                     await clients[username].put("Invalid arguments")
 
-            else:
-                await clients[username].put("Unknown command")
-
             elif cmd == "movemonsters":
-                """command processing movemonsters: movemonsters on/off"""
+                """Handle movemonsters command: movemonsters on/off"""
                 try:
                     global wandering_monsters_enabled
                     state = parts[1].lower()
                     if state == "on":
-                        wandering_monsters_enabled = True
-                        await clients[username].put("Режим бродячих монстров: включен")
+                        if not wandering_monsters_enabled:
+                            wandering_monsters_enabled = True
+                            await broadcast_message(f"Moving monsters: on")
+                        else:
+                            await clients[username].put("Moving monsters: on")
                     elif state == "off":
-                        wandering_monsters_enabled = False
-                        await clients[username].put("Режим бродячих монстров: выключен")
+                        if wandering_monsters_enabled:
+                            wandering_monsters_enabled = False
+                            await broadcast_message(f"Moving monsters: off")
+                        else:
+                            await clients[username].put("Moving monsters: off")
                     else:
-                        await clients[username].put("Неверный аргумент. Используйте 'on' или 'off'")
+                        await clients[username].put("Invalid argument. Use 'on' or 'off'")
                 except IndexError:
-                    await clients[username].put("Неверные аргументы")
+                    await clients[username].put("Invalid arguments. Usage: movemonsters on|off")
+
+            else:
+                await clients[username].put("Unknown command")
 
     except Exception as e:
         print(f"Error: {e}")
