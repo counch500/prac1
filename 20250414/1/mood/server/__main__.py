@@ -14,7 +14,7 @@ games = {}
 # Глобальные переменные для хранения общего состояния игры
 game_field = [[None for _ in range(10)] for _ in range(10)]
 monsters = set()
-
+wandering_monsters_enabled = True 
 
 class MUD:
     """Main MUD game class handling player actions and game state.
