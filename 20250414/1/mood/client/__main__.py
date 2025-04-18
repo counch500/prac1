@@ -50,14 +50,19 @@ class Client_MUD(cmd.Cmd):
         self.receive_thread.start()
 
     def do_movemonsters(self, args):
-        """Turn on/off stray monsters: movemonsters on/off"""
-        if args.lower() not in ["on", "off"]:
-            print("Wrong argument. Use 'on' or 'off'")
+        """Toggle wandering monsters mode
+        Usage: movemonsters on|off
+        """
+        args = args.strip().lower()
+        if args not in ["on", "off"]:
+            print("Error: please use 'on' or 'off'")
+            print("Example: movemonsters off")
             return
+            
         try:
             self.s.sendall(f"movemonsters {args}\n".encode())
         except ConnectionError:
-            print("\nConnection lost. Exiting...")
+            print("\nConnection to server lost")
             return True
 
     def receive_messages(self):
@@ -70,9 +75,7 @@ class Client_MUD(cmd.Cmd):
             # Strip only trailing whitespace to preserve newlines in cowsay art
                 message = message.rstrip()
                 if message:
-                # Сохраняем текущий ввод пользователя
                     current_input = readline.get_line_buffer()
-                # Выводим сообщение и восстанавливаем ввод пользователя за один раз
                     sys.stdout.write(f"\r{message}\n{self.prompt}{current_input}")
                     sys.stdout.flush()
             except ConnectionError:
