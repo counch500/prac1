@@ -49,6 +49,17 @@ class Client_MUD(cmd.Cmd):
         self.receive_thread = threading.Thread(target=self.receive_messages, daemon=True)
         self.receive_thread.start()
 
+    def do_movemonsters(self, args):
+        """Turn on/off stray monsters: movemonsters on/off"""
+        if args.lower() not in ["on", "off"]:
+            print("Wrong argument. Use 'on' or 'off'")
+            return
+        try:
+            self.s.sendall(f"movemonsters {args}\n".encode())
+        except ConnectionError:
+            print("\nConnection lost. Exiting...")
+            return True
+
     def receive_messages(self):
         while True:
             try:
