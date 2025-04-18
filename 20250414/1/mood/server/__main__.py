@@ -146,12 +146,15 @@ class MUD:
 
 async def wander_monsters():
     """Periodically move monsters around the game field."""
+    global wandering_monsters_enabled
     while True:
         await asyncio.sleep(30)
+        if not wandering_monsters_enabled:  # Проверяем флаг
+            continue
         if not monsters:
             print("[SERVER] Нет монстров для перемещения")
             continue
-            
+
         moved = False
         attempts = 0
         max_attempts = 100
@@ -340,6 +343,22 @@ async def handle_client(reader, writer):
 
             else:
                 await clients[username].put("Unknown command")
+
+            elif cmd == "movemonsters":
+                """command processing movemonsters: movemonsters on/off"""
+                try:
+                    global wandering_monsters_enabled
+                    state = parts[1].lower()
+                    if state == "on":
+                        wandering_monsters_enabled = True
+                        await clients[username].put("Режим бродячих монстров: включен")
+                    elif state == "off":
+                        wandering_monsters_enabled = False
+                        await clients[username].put("Режим бродячих монстров: выключен")
+                    else:
+                        await clients[username].put("Неверный аргумент. Используйте 'on' или 'off'")
+                except IndexError:
+                    await clients[username].put("Неверные аргументы")
 
     except Exception as e:
         print(f"Error: {e}")
