@@ -2,6 +2,7 @@
 Client module for MOOD MUD game.
 """
 
+import time
 import cmd
 import shlex
 import cowsay
@@ -29,13 +30,26 @@ class Client_MUD(cmd.Cmd):
     host = "localhost"
     port = 1337
 
-    def __init__(self, username):
+    def __init__(self, username, script_file=None):
         super().__init__()
         self.username = username
+        self.script_file = script_file
+        
+        # Если передан файл скрипта - настраиваем режим чтения из файла
+        if script_file:
+            if not script_file.endswith('.mood'):
+                print("Warning: Script files should use .mood extension")
+            try:
+                self.stdin = open(script_file, 'r')
+                self.prompt = ''
+                self.use_rawinput = False
+            except FileNotFoundError:
+                print(f"Error: Script file {script_file} not found")
+                sys.exit(1)
+
         self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.s.connect((self.host, self.port))
 
-        # Отправляем имя пользователя при подключении
         self.s.sendall(f"{username}\n".encode())
         response = self.s.recv(1024).decode().strip()
         if response == "Username already taken":
@@ -44,10 +58,18 @@ class Client_MUD(cmd.Cmd):
         print(response)
 
         self.monsters = set()
-
-        # Start message receiving thread
         self.receive_thread = threading.Thread(target=self.receive_messages, daemon=True)
         self.receive_thread.start()
+
+    def precmd(self, line):
+        """Добавляем задержку 1 секунду при чтении из скрипта"""
+        if self.script_file:
+            time.sleep(1)  # Задержка между командами
+        return line
+
+    def do_EOF(self, arg):
+        """Обработка конца файла для автоматического выхода"""
+        return True  # Завершает cmdloop при окончании скрипта
 
     def do_movemonsters(self, args):
         """Toggle wandering monsters mode
@@ -267,8 +289,14 @@ def parse_args(args, param):
 if __name__ == '__main__':
     print("<<< Welcome to Python-MUD 0.1 >>>")
     if len(sys.argv) < 2:
-        print("Usage: python client.py <username>")
+        print("Usage: python client.py <username> [--file <script.mood>]")
         sys.exit(1)
 
     username = sys.argv[1]
-    Client_MUD(username).cmdloop()
+    script_file = None
+    
+    # Обрабатываем аргумент --file
+    if len(sys.argv) > 3 and sys.argv[2] == '--file':
+        script_file = sys.argv[3]
+    
+    Client_MUD(username, script_file).cmdloop()
