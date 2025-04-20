@@ -6,7 +6,23 @@ import random
 import asyncio
 import cowsay
 import shlex
+import gettext
+import os
+from pathlib import Path
 
+LOCALE_DIR = Path(__file__).parent / 'locales'
+translations = {
+    'en_US': gettext.NullTranslations(),
+    'ru_RU.UTF-8': gettext.translation('mood', LOCALE_DIR, ['ru'], fallback=True)
+}
+
+def _(text, locale='en_US'):
+    """Translate text based on locale"""
+    return translations.get(locale, translations['en_US']).gettext(text)
+
+def ngettext(singular, plural, n, locale='en_US'):
+    """Translate plural forms"""
+    return translations.get(locale, translations['en_US']).ngettext(singular, plural, n)
 
 clients = {}  
 games = {}  
@@ -34,6 +50,7 @@ class MUD:
         self.player_position = (0, 0)
         self.weapons = {"sword": 10, "spear": 15, "axe": 20}
         self.username = username
+        self.locale = 'en_US'  
         self.jgsbat_func = None
         try:
             with open("jgsbat.cow", "r", encoding="utf-8") as f:
@@ -142,6 +159,25 @@ class MUD:
             return f'{damage} 0'
         game_field[x][y] = (name, hello, hp)
         return f'{damage} {hp}'
+async def send_localized(queue, locale, msg, *args):
+    """Send localized message to client queue"""
+    try:
+        if any(isinstance(arg, int) for arg in args):
+            # Handle plural forms
+            last_num = next(arg for arg in reversed(args) if isinstance(arg, int))
+            localized = ngettext(msg, msg.replace("hp", "hps"), last_num, locale) % args
+        else:
+            localized = _(msg, locale) % args
+        await queue.put(localized)
+    except Exception as e:
+        print(f"Localization error: {e}")
+        await queue.put(msg % args)  # Fallback to original
+
+async def broadcast_localized(msg, *args, exclude=None):
+    """Broadcast localized message to all clients"""
+    for username, queue in clients.items():
+        if username != exclude:
+            await send_localized(queue, games[username].locale, msg, *args)
 
 async def broadcast_message(message, exclude=None):
     """Send message to all connected clients.
@@ -153,19 +189,12 @@ async def broadcast_message(message, exclude=None):
     for username, queue in clients.items():
         if username != exclude:
             await queue.put(message)
-
-
 async def handle_client(reader, writer):
-    """Handle incoming client connection.
-
-    Args:
-        reader: asyncio StreamReader
-        writer: asyncio StreamWriter
-    """
+    """Handle incoming client connection with localization support"""
     username = (await reader.readline()).decode().strip()
 
     if username in clients:
-        writer.write(b"Username already taken\n")
+        writer.write(_("Username already taken", 'en_US').encode() + b'\n')
         await writer.drain()
         writer.close()
         await writer.wait_closed()
@@ -174,10 +203,12 @@ async def handle_client(reader, writer):
     clients[username] = asyncio.Queue()
     games[username] = MUD(username)
 
-    writer.write(b"Welcome to MUD!\n")
+    # Send welcome message in client's locale
+    welcome_msg = _("Welcome to MUD!", games[username].locale)
+    writer.write(welcome_msg.encode() + b'\n')
     await writer.drain()
 
-    await broadcast_message(f"[SERVER] {username} has joined the game", exclude=username)
+    await broadcast_localized("[SERVER] %s has joined the game", username, exclude=username)
     print(f"[SERVER] {username} connected")
 
     send_task = asyncio.create_task(send_messages(writer, username))
@@ -196,62 +227,108 @@ async def handle_client(reader, writer):
             cmd = parts[0]
             game = games[username]
 
-            if cmd == "addmon":
-                """Handle addmon command: addmon name x y hp hello"""
+            if cmd == "locale":
+                """Handle locale command: locale <lang>"""
+                if len(parts) < 2:
+                    await send_localized(clients[username], game.locale, 
+                                       "Usage: locale <lang>")
+                    continue
+                
+                lang = parts[1]
+                if lang not in translations:
+                    await send_localized(clients[username], game.locale,
+                                       "Unsupported locale. Available: %s", 
+                                       ", ".join(translations.keys()))
+                    continue
+                
+                game.locale = lang
+                await send_localized(clients[username], lang, 
+                                    "Set up locale: %s", lang)
+
+            elif cmd == "addmon":
+                """Handle addmon command with localization"""
                 try:
                     name, x, y, hp = parts[1:5]
                     hello = ' '.join(parts[5:])
                     x, y, hp = map(int, [x, y, hp])
+                    
                     if name not in cowsay.list_cows() and name != "jgsbat":
-                        await clients[username].put("cannot add unknown monster")
+                        await send_localized(clients[username], game.locale,
+                                           "cannot add unknown monster")
                         continue
+                    
                     if (x, y) == game.player_position:
-                        await clients[username].put("cannot add the monster in player's position")
+                        await send_localized(clients[username], game.locale,
+                                           "cannot add monster to player's position")
                         continue
+                    
                     if x < 0 or x >= 10 or y < 0 or y >= 10 or hp <= 0:
-                        await clients[username].put("Invalid arguments")
+                        await send_localized(clients[username], game.locale,
+                                           "Invalid arguments")
                         continue
 
                     old_mon = game_field[x][y] is not None
                     game_field[x][y] = (name, hello, hp)
                     monsters.add(name)
-                    message = f"[SERVER]{username} added monster {name} to ({x}, {y}) with {hp} hp"
+                    
                     if old_mon:
-                        message += "\nReplaced the old monster"
-                    await broadcast_message(message)
+                        await broadcast_localized(
+                            "[SERVER] %s added monster %s to (%d, %d) with %d hp\n" +
+                            _("Replaced the old monster", game.locale),
+                            username, name, x, y, hp,
+                            exclude=username
+                        )
+                    else:
+                        await broadcast_localized(
+                            "[SERVER] %s added monster %s to (%d, %d) with %d hp",
+                            username, name, x, y, hp,
+                            exclude=username
+                        )
                 except (ValueError, IndexError):
-                    await clients[username].put("Invalid arguments")
+                    await send_localized(clients[username], game.locale,
+                                       "Invalid arguments")
 
             elif cmd == "attack":
-                """Handle attack command: attack weapon name"""
+                """Handle attack command with localized HP messages"""
                 try:
                     weapon, name = parts[1:3]
-                    if weapon not in ["sword", "spear", "axe"]:
-                        await clients[username].put("Unknown weapon")
+                    if weapon not in game.weapons:
+                        await send_localized(clients[username], game.locale,
+                                           "Unknown weapon")
                         continue
+                    
                     if name not in monsters:
-                        await clients[username].put(f"no such monster {name}")
+                        await send_localized(clients[username], game.locale,
+                                           "no such monster %s", name)
                         continue
 
                     x, y = game.player_position
                     monster = game_field[x][y]
                     if not monster or monster[0] != name:
-                        await clients[username].put(f"no {name} here")
+                        await send_localized(clients[username], game.locale,
+                                           "no %s here", name)
                         continue
 
-                    name, hello, hp = monster
+                    _, _, hp = monster
                     damage = min(game.weapons[weapon], hp)
                     hp -= damage
+                    
                     if hp <= 0:
                         game_field[x][y] = None
                         monsters.remove(name)
-                        print(f"[SERVER] {username} murdered {name} at ({x},{y})")
-                        await broadcast_message(f"[SERVER] {username} attacked {name} with {weapon} for {damage} hp, {name} died")
+                        await broadcast_localized(
+                            "[SERVER] %s attacked %s with %s for %d hp, %s died",
+                            username, name, weapon, damage, name
+                        )
                     else:
-                        game_field[x][y] = (name, hello, hp)
-                        await broadcast_message(f"[SERVER] {username} attacked {name} with {weapon} for {damage} hp, {name} has {hp} hp left")
+                        game_field[x][y] = (name, _, hp)
+                        await broadcast_localized(
+                            "[SERVER] %s attacked %s with %s for %d hp, %s has %d hp left",
+                            username, name, weapon, damage, name, hp
+                        )
                 except (ValueError, IndexError):
-                    await clients[username].put("Invalid arguments")
+                    await send_localized(clients[username], game.locale,
+                                       "Invalid arguments")
 
             elif cmd == "move":
                 """Handle move command: move dx dy"""
@@ -320,8 +397,7 @@ async def handle_client(reader, writer):
         if username in games:
             del games[username]
 
-        await broadcast_message(f"[SERVER] {username} has left the game", exclude=username)
-
+        await broadcast_localized("[SERVER] %s has left the game", username, exclude=username)
         writer.close()
         await writer.wait_closed()
         print(f"{username} disconnected")
