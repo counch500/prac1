@@ -143,65 +143,6 @@ class MUD:
         game_field[x][y] = (name, hello, hp)
         return f'{damage} {hp}'
 
-async def wander_monsters():
-    """Periodically move monsters around the game field."""
-    global wandering_monsters_enabled
-    while True:
-        await asyncio.sleep(30)
-        if not wandering_monsters_enabled:
-            continue
-        if not monsters:
-            print("[SERVER] No monsters to move")
-            continue
-
-        moved = False
-        attempts = 0
-        max_attempts = 100
-            
-        while not moved and attempts < max_attempts:
-            attempts += 1
-            name = random.choice(list(monsters))
-            positions = []
-            for x in range(10):
-                for y in range(10):
-                    if game_field[x][y] and game_field[x][y][0] == name:
-                        positions.append((x, y))
-            
-            if not positions:
-                continue
-                
-            x, y = random.choice(positions)
-            direction = random.choice(['up', 'down', 'left', 'right'])
-            
-            new_x, new_y = x, y
-            if direction == 'up':
-                new_y = (y - 1) % 10
-            elif direction == 'down':
-                new_y = (y + 1) % 10
-            elif direction == 'left':
-                new_x = (x - 1) % 10
-            elif direction == 'right':
-                new_x = (x + 1) % 10
-                
-            if game_field[new_x][new_y] is None:
-                monster = game_field[x][y]
-                game_field[x][y] = None
-                game_field[new_x][new_y] = monster
-                moved = True
-                
-                # Логирование на сервере
-                print(f"[SERVER] Monster {name} moved from ({x},{y}) to ({new_x},{new_y})")
-                
-                # Уведомление всех клиентов
-                await broadcast_message(f"[SERVER] {name} moved by {direction} to ({new_x},{new_y})")
-                
-                # Проверка встречи с игроками
-                for username, game in games.items():
-                    if game.player_position == (new_x, new_y):
-                        encounter_msg = game.encounter(new_x, new_y)
-                        if encounter_msg:
-                            await clients[username].put(encounter_msg)
-
 async def broadcast_message(message, exclude=None):
     """Send message to all connected clients.
 
@@ -305,7 +246,7 @@ async def handle_client(reader, writer):
                         game_field[x][y] = None
                         monsters.remove(name)
                         print(f"[SERVER] {username} murdered {name} at ({x},{y})")
-                        await broadcast_message(f"{username} attacked {name} with {weapon} for {damage} hp, {name} died")
+                        await broadcast_message(f"[SERVER] {username} attacked {name} with {weapon} for {damage} hp, {name} died")
                     else:
                         game_field[x][y] = (name, hello, hp)
                         await broadcast_message(f"[SERVER] {username} attacked {name} with {weapon} for {damage} hp, {name} has {hp} hp left")
@@ -401,6 +342,67 @@ async def send_messages(writer, username):
     except asyncio.CancelledError:
         pass
 
+
+async def wander_monsters():
+    """Periodically move monsters around the game field."""
+    global wandering_monsters_enabled
+    while True:
+        await asyncio.sleep(30)
+        if not wandering_monsters_enabled:
+            continue
+        if not monsters:
+            print("[SERVER] No monsters to move")
+            continue
+
+        moved = False
+        attempts = 0
+        max_attempts = 100
+            
+        while not moved and attempts < max_attempts:
+            attempts += 1
+            name = random.choice(list(monsters))
+            positions = []
+            for x in range(10):
+                for y in range(10):
+                    if game_field[x][y] and game_field[x][y][0] == name:
+                        positions.append((x, y))
+            
+            if not positions:
+                continue
+                
+            x, y = random.choice(positions)
+            direction = random.choice(['up', 'down', 'left', 'right'])
+            
+            new_x, new_y = x, y
+            if direction == 'up':
+                new_y = (y - 1) % 10
+            elif direction == 'down':
+                new_y = (y + 1) % 10
+            elif direction == 'left':
+                new_x = (x - 1) % 10
+            elif direction == 'right':
+                new_x = (x + 1) % 10
+                
+            if game_field[new_x][new_y] is None:
+                monster = game_field[x][y]
+                game_field[x][y] = None
+                game_field[new_x][new_y] = monster
+                moved = True
+                
+                # Логирование на сервере
+                print(f"[SERVER] Monster {name} moved from ({x},{y}) to ({new_x},{new_y})")
+                
+                # Уведомление всех клиентов
+                move_msg = f"{name} moved one cell {direction}"
+                await broadcast_message(f"[SERVER] {move_msg}")
+                print(f"[SERVER] {move_msg}")
+
+                # Проверка встречи с игроками
+                for username, game in games.items():
+                    if game.player_position == (new_x, new_y):
+                        encounter_msg = game.encounter(new_x, new_y)
+                        if encounter_msg:
+                            await clients[username].put(encounter_msg)
 
 async def main():
     """Main server entry point."""
