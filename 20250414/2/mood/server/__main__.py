@@ -72,7 +72,6 @@ class MUD:
             return cowsay.cowsay(hello, cow=name)
         return ''
 
-# Game state
 clients = {}
 games = {}
 game_field = [[None for _ in range(10)] for _ in range(10)]
@@ -110,7 +109,7 @@ async def handle_client(reader, writer):
     username = (await reader.readline()).decode().strip()
 
     if username in clients:
-        game = MUD('temp')  # Temporary instance for translation
+        game = MUD('temp')
         writer.write(game._("Username already taken\n", 'en_US.UTF-8').encode())
         await writer.drain()
         writer.close()
@@ -120,12 +119,12 @@ async def handle_client(reader, writer):
     clients[username] = asyncio.Queue()
     games[username] = MUD(username)
 
-    # Send localized welcome message
     welcome_msg = games[username]._("Welcome to MUD, {}!\n").format(username)
     writer.write(welcome_msg.encode())
     await writer.drain()
 
     await broadcast_localized("{} connected to raid!\n", username, exclude=username)
+
     print(f"[SERVER] {username} connected")
 
     send_task = asyncio.create_task(send_messages(writer, username))
@@ -179,47 +178,60 @@ async def handle_client(reader, writer):
                     game_field[x][y] = (name, hello, hp)
                     monsters.add(name)
                     
-                    message = _("{username} added monster {name} to ({x}, {y}) with {hp} hp").format(
-                        username=username, name=name, x=x, y=y, hp=hp
+                    await broadcast_localized(
+                        game.ngettext(
+                            "{} added monster {} to ({}, {}) with {} hp",
+                            "{} added monster {} to ({}, {}) with {} hp", 
+                            hp
+                        ).format(
+                            username,
+                            name,
+                            x,
+                            y,
+                            hp
+                        ),
+                        exclude=username
                     )
                     if old_mon:
-                        message += "\n" + _("Replaced the old monster")
-                    await broadcast_message(message)
+                        await broadcast_localized(game._("Replaced the old monster\n"))
                 except (ValueError, IndexError):
-                    await clients[username].put(_("Invalid arguments"))
-
+                    await clients[username].put(game._("Invalid arguments"))
             elif cmd == "attack":
+                """Handle attack command: attack <monster> [with <weapon>]"""
                 try:
-                    weapon = "sword"
-                    name = parts[1]
-                    if len(parts) > 2 and parts[2] == "with":
+                    if len(parts) == 2:
+                        name = parts[1]
+                        weapon = "sword"  # default
+                    elif len(parts) == 4 and parts[2] == "with":
+                        name = parts[1]
                         weapon = parts[3]
-                    
+                    else:
+                        await clients[username].put(game._("Invalid arguments\n"))
+                        return
+
                     if weapon not in game.weapons:
                         await clients[username].put(game._("Unknown weapon\n"))
-                        continue
-                    
+                        return
+
                     if name not in monsters:
-                        await clients[username].put(
-                            game._("No such monster {}\n").format(name))
-                        continue
+                        await clients[username].put(game._("No such monster {}\n").format(name))
+                        return
 
                     x, y = game.player_position
                     monster = game_field[x][y]
                     if not monster or monster[0] != name:
-                        await clients[username].put(
-                            game._("No {} here\n").format(name))
-                        continue
+                        await clients[username].put(game._("No {} here\n").format(name))
+                        return
 
                     name, hello, hp = monster
                     damage = min(game.weapons[weapon], hp)
                     hp -= damage
-                    
+
                     response = game.ngettext(
                         "Attacked {} with {}, damage {} hitpoint\n",
                         "Attacked {} with {}, damage {} hitpoints\n",
                         damage).format(name, weapon, damage)
-                    
+
                     if hp > 0:
                         game_field[x][y] = (name, hello, hp)
                         response += game.ngettext(
@@ -230,36 +242,28 @@ async def handle_client(reader, writer):
                         game_field[x][y] = None
                         monsters.remove(name)
                         response += game._('{} died\n').format(name)
-                    
+
                     await clients[username].put(response)
-                    
-                    # Broadcast attack results
+
+                    # Broadcast
                     if hp > 0:
                         await broadcast_localized(
-                            game.ngettext(
-                                "Player {} attacked {} with {}, dealing {} point of damage.\n",
-                                "Player {} attacked {} with {}, dealing {} points of damage.\n",
-                                damage),
+                            "Player {} attacked {} with {}, dealing {} points of damage.\n",
                             username, name, weapon, damage,
                             exclude=username
                         )
                         await broadcast_localized(
-                            game.ngettext(
-                                "Now {} has {} hitpoint.\n",
-                                "Now {} has {} hitpoints.\n",
-                                hp),
+                            "Now {} has {} hitpoints.\n",
                             name, hp,
                             exclude=username
                         )
                     else:
                         await broadcast_localized(
-                            game.ngettext(
-                                "Player {} attacked {} with {}, dealing fatal {} point of damage. {} is dead now.\n",
-                                "Player {} attacked {} with {}, dealing fatal {} points of damage. {} is dead now.\n",
-                                damage),
+                            "Player {} attacked {} with {}, dealing fatal {} points of damage. {} is dead now.\n",
                             username, name, weapon, damage, name,
                             exclude=username
                         )
+
                 except (ValueError, IndexError):
                     await clients[username].put(game._("Invalid arguments\n"))
 
@@ -335,6 +339,8 @@ async def handle_client(reader, writer):
         except asyncio.CancelledError:
             pass
 
+        game = games.get(username)
+
         if username in clients:
             del clients[username]
         if username in games:
@@ -343,7 +349,9 @@ async def handle_client(reader, writer):
         await broadcast_localized("User {} leave the dungeon...\n", username, exclude=username)
         writer.close()
         await writer.wait_closed()
-        print(games[username]._("User {} disconnected").format(username))
+
+        if game:
+            print(game._("User {} disconnected").format(username))
 
 
 async def send_messages(writer, username):
@@ -369,8 +377,12 @@ async def wander_monsters():
         await asyncio.sleep(30)
         if not wandering_monsters_enabled:
             continue
+        if not games:  # если нет подключенных клиентов
+            continue
+        game = next(iter(games.values()))
+
         if not monsters:
-            print("[SERVER] No monsters to move")
+            print(game._("[SERVER] No monsters to move"))
             continue
 
         moved = False
@@ -408,15 +420,25 @@ async def wander_monsters():
                 game_field[new_x][new_y] = monster
                 moved = True
                 
-                # Логирование на сервере
                 print(f"[SERVER] Monster {name} moved from ({x},{y}) to ({new_x},{new_y})")
                 
-                # Уведомление всех клиентов
-                move_msg = f"{name} moved one cell {direction}"
-                await broadcast_message(f"[SERVER] {move_msg}")
-                print(f"[SERVER] {move_msg}")
+                # Локализованные направления
+                dir_translation = {
+                    'up': game._("up"),
+                    'down': game._("down"),
+                    'left': game._("left"),
+                    'right': game._("right")
+                }
+                
+                move_msg = game._("{name} moved one cell {direction}").format(
+                    name=name,
+                    direction=dir_translation[direction]
+                )
+                
+                # Используем broadcast_localized вместо broadcast_message
+                await broadcast_localized("[SERVER] {}", move_msg)
 
-                # Проверка встречи с игроками
+       
                 for username, game in games.items():
                     if game.player_position == (new_x, new_y):
                         encounter_msg = game.encounter(new_x, new_y)
