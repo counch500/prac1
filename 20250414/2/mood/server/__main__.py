@@ -197,75 +197,44 @@ async def handle_client(reader, writer):
                 except (ValueError, IndexError):
                     await clients[username].put(game._("Invalid arguments"))
             elif cmd == "attack":
-                """Handle attack command: attack <monster> [with <weapon>]"""
+                """Handle attack command: attack <weapon> <monster_name>"""
                 try:
-                    if len(parts) == 2:
-                        name = parts[1]
-                        weapon = "sword"  # default
-                    elif len(parts) == 4 and parts[2] == "with":
-                        name = parts[1]
-                        weapon = parts[3]
-                    else:
-                        await clients[username].put(game._("Invalid arguments\n"))
-                        return
-
+                    weapon, name = parts[1:3]
                     if weapon not in game.weapons:
                         await clients[username].put(game._("Unknown weapon\n"))
-                        return
+                        continue
 
                     if name not in monsters:
                         await clients[username].put(game._("No such monster {}\n").format(name))
-                        return
+                        continue
 
                     x, y = game.player_position
                     monster = game_field[x][y]
                     if not monster or monster[0] != name:
                         await clients[username].put(game._("No {} here\n").format(name))
-                        return
+                        continue
 
                     name, hello, hp = monster
                     damage = min(game.weapons[weapon], hp)
                     hp -= damage
 
-                    response = game.ngettext(
-                        "Attacked {} with {}, damage {} hitpoint\n",
-                        "Attacked {} with {}, damage {} hitpoints\n",
-                        damage).format(name, weapon, damage)
-
-                    if hp > 0:
-                        game_field[x][y] = (name, hello, hp)
-                        response += game.ngettext(
-                            '{} now has {} hitpoint\n', 
-                            '{} now has {} hitpoints\n', 
-                            hp).format(name, hp)
-                    else:
+                    if hp <= 0:
                         game_field[x][y] = None
                         monsters.remove(name)
-                        response += game._('{} died\n').format(name)
-
-                    await clients[username].put(response)
-
-                    # Broadcast
-                    if hp > 0:
                         await broadcast_localized(
-                            "Player {} attacked {} with {}, dealing {} points of damage.\n",
-                            username, name, weapon, damage,
-                            exclude=username
-                        )
-                        await broadcast_localized(
-                            "Now {} has {} hitpoints.\n",
-                            name, hp,
-                            exclude=username
+                            "{} attacked {} with {} for {} hp, {} died",
+                            username, name, weapon, damage, name
                         )
                     else:
+                        game_field[x][y] = (name, hello, hp)
                         await broadcast_localized(
-                            "Player {} attacked {} with {}, dealing fatal {} points of damage. {} is dead now.\n",
-                            username, name, weapon, damage, name,
-                            exclude=username
+                            "{} attacked {} with {} for {} hp, {} has {} hp left",
+                            username, name, weapon, damage, name, hp
                         )
 
                 except (ValueError, IndexError):
                     await clients[username].put(game._("Invalid arguments\n"))
+
 
             elif cmd == "move":
                 """Handle move command: move dx dy"""
