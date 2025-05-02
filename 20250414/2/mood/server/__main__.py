@@ -222,16 +222,36 @@ async def handle_client(reader, writer):
                         game_field[x][y] = None
                         monsters.remove(name)
                         await broadcast_localized(
-                            "{} attacked {} with {} for {} hp, {} died",
-                            username, name, weapon, damage, name
+                            game.ngettext(
+                                "{} attacked {} with {} for {} hp, {} died",
+                                "{} attacked {} with {} for {} hp, {} died", 
+                                damage
+                            ).format(
+                                username,
+                                name,
+                                weapon,
+                                damage,
+                                name
+                            ),
+                            exclude=username
                         )
                     else:
                         game_field[x][y] = (name, hello, hp)
                         await broadcast_localized(
-                            "{} attacked {} with {} for {} hp, {} has {} hp left",
-                            username, name, weapon, damage, name, hp
+                            game.ngettext(
+                                "{} attacked {} with {} for {} hp, {} has {} hp left",
+                                "{} attacked {} with {} for {} hp, {} has {} hp left", 
+                                hp
+                            ).format(
+                                username,
+                                name,
+                                weapon,
+                                damage,
+                                name,
+                                hp
+                            ),
+                            exclude=username
                         )
-
                 except (ValueError, IndexError):
                     await clients[username].put(game._("Invalid arguments\n"))
 

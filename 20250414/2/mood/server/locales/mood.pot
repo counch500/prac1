@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-05-01 16:39+0300\n"
+"POT-Creation-Date: 2025-05-02 10:42+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,151 +29,121 @@ msgstr ""
 msgid "Welcome to MUD, {}!\n"
 msgstr ""
 
-#: mood/server/__main__.py:126
-msgid "{} connected to raid!\n"
-msgstr ""
-
-#: mood/server/__main__.py:147
+#: mood/server/__main__.py:148
 msgid "Usage: locale <lang>\n"
 msgstr ""
 
-#: mood/server/__main__.py:153
+#: mood/server/__main__.py:154
 msgid "Only ru_RU.UTF-8 and en_US.UTF-8 locales are available\n"
 msgstr ""
 
-#: mood/server/__main__.py:158
+#: mood/server/__main__.py:159
 msgid "Set up locale: {}\n"
 msgstr ""
 
-#: mood/server/__main__.py:167
+#: mood/server/__main__.py:168
 msgid "Cannot add unknown monster"
 msgstr ""
 
-#: mood/server/__main__.py:170
+#: mood/server/__main__.py:171
 msgid "Cannot add monster to player's position"
 msgstr ""
 
-#: mood/server/__main__.py:173 mood/server/__main__.py:197
-#: mood/server/__main__.py:290 mood/server/__main__.py:297
-#: mood/server/__main__.py:304 mood/server/__main__.py:314
+#: mood/server/__main__.py:174 mood/server/__main__.py:198
+#: mood/server/__main__.py:275 mood/server/__main__.py:282
+#: mood/server/__main__.py:289 mood/server/__main__.py:299
 msgid "Invalid arguments"
 msgstr ""
 
-#: mood/server/__main__.py:181
+#: mood/server/__main__.py:182
 msgid "{} added monster {} to ({}, {}) with {} hp"
 msgid_plural "{} added monster {} to ({}, {}) with {} hp"
 msgstr[0] ""
 msgstr[1] ""
 
-#: mood/server/__main__.py:195
+#: mood/server/__main__.py:196
 msgid "Replaced the old monster\n"
 msgstr ""
 
-#: mood/server/__main__.py:207
+#: mood/server/__main__.py:204
 msgid "Unknown weapon\n"
 msgstr ""
 
-#: mood/server/__main__.py:212
+#: mood/server/__main__.py:208
 msgid "No such monster {}\n"
 msgstr ""
 
-#: mood/server/__main__.py:219
+#: mood/server/__main__.py:214
 msgid "No {} here\n"
 msgstr ""
 
-#: mood/server/__main__.py:226
-msgid "Attacked {} with {}, damage {} hitpoint\n"
-msgid_plural "Attacked {} with {}, damage {} hitpoints\n"
+#: mood/server/__main__.py:225
+msgid "{} attacked {} with {} for {} hp, {} died"
+msgid_plural "{} attacked {} with {} for {} hp, {} died"
 msgstr[0] ""
 msgstr[1] ""
 
-#: mood/server/__main__.py:233
-msgid "{} now has {} hitpoint\n"
-msgid_plural "{} now has {} hitpoints\n"
+#: mood/server/__main__.py:241
+msgid "{} attacked {} with {} for {} hp, {} has {} hp left"
+msgid_plural "{} attacked {} with {} for {} hp, {} has {} hp left"
 msgstr[0] ""
 msgstr[1] ""
 
-#: mood/server/__main__.py:240
-msgid "{} died\n"
-msgstr ""
-
-#: mood/server/__main__.py:247
-msgid "Player {} attacked {} with {}, dealing {} point of damage.\n"
-msgid_plural "Player {} attacked {} with {}, dealing {} points of damage.\n"
-msgstr[0] ""
-msgstr[1] ""
-
-#: mood/server/__main__.py:255
-msgid "Now {} has {} hitpoint.\n"
-msgid_plural "Now {} has {} hitpoints.\n"
-msgstr[0] ""
-msgstr[1] ""
-
-#: mood/server/__main__.py:264
-msgid ""
-"Player {} attacked {} with {}, dealing fatal {} point of damage. {} is "
-"dead now.\n"
-msgid_plural ""
-"Player {} attacked {} with {}, dealing fatal {} points of damage. {} is "
-"dead now.\n"
-msgstr[0] ""
-msgstr[1] ""
-
-#: mood/server/__main__.py:272
+#: mood/server/__main__.py:256
 msgid "Invalid arguments\n"
 msgstr ""
 
-#: mood/server/__main__.py:282
+#: mood/server/__main__.py:267
 msgid ""
 "[SERVER] Moved to ({})\n"
 "{}"
 msgstr ""
 
-#: mood/server/__main__.py:286
+#: mood/server/__main__.py:271
 msgid "[SERVER] Moved to ({})"
 msgstr ""
 
-#: mood/server/__main__.py:325
+#: mood/server/__main__.py:310
 msgid "Moving monsters: on"
 msgstr ""
 
-#: mood/server/__main__.py:331
+#: mood/server/__main__.py:316
 msgid "Moving monsters: off"
 msgstr ""
 
-#: mood/server/__main__.py:333
+#: mood/server/__main__.py:318
 msgid "Invalid argument. Use 'on' or 'off'"
 msgstr ""
 
-#: mood/server/__main__.py:335
+#: mood/server/__main__.py:320
 msgid "Invalid arguments. Usage: movemonsters on|off"
 msgstr ""
 
-#: mood/server/__main__.py:352
+#: mood/server/__main__.py:343
 msgid "User {} disconnected"
 msgstr ""
 
-#: mood/server/__main__.py:383
+#: mood/server/__main__.py:374
 msgid "[SERVER] No monsters to move"
 msgstr ""
 
-#: mood/server/__main__.py:422
+#: mood/server/__main__.py:416
 msgid "up"
 msgstr ""
 
-#: mood/server/__main__.py:423
+#: mood/server/__main__.py:417
 msgid "down"
 msgstr ""
 
-#: mood/server/__main__.py:424
+#: mood/server/__main__.py:418
 msgid "left"
 msgstr ""
 
-#: mood/server/__main__.py:425
+#: mood/server/__main__.py:419
 msgid "right"
 msgstr ""
 
-#: mood/server/__main__.py:427
-msgid "{} moved one cell {}"
+#: mood/server/__main__.py:422
+msgid "{name} moved one cell {direction}"
 msgstr ""
 
