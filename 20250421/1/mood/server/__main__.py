@@ -434,19 +434,19 @@ async def wander_monsters():
                         if encounter_msg:
                             await clients[username].put(encounter_msg)
 
-async def main():
-    """Main server entry point."""
-    print(f"Locales dir: {MUD.locales_dir}")
-    print(f"Translation files exist: {os.path.exists(os.path.join(MUD.locales_dir, 'ru/LC_MESSAGES/mood.mo'))}")
-    server = await asyncio.start_server(handle_client, '0.0.0.0', 1337)
-    addr = server.sockets[0].getsockname()
-    print(f"[SERVER] Запущен на {addr[0]}:{addr[1]}")
+def run_server(host='0.0.0.0', port=1337):
+    """Run the MUD server with specified host and port."""
+    async def inner_run():
+        server = await asyncio.start_server(handle_client, host, port)
+        addr = server.sockets[0].getsockname()
+        print(f"[SERVER] Running on {addr[0]}:{addr[1]}")
+        
+        asyncio.create_task(wander_monsters())
+        
+        async with server:
+            await server.serve_forever()
     
-    asyncio.create_task(wander_monsters())
-    
-    async with server:
-        await server.serve_forever()
-
+    asyncio.run(inner_run())
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    run_server()
