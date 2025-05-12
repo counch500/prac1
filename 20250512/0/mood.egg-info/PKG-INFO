@@ -1,0 +1,7 @@
+Metadata-Version: 2.4
+Name: mood
+Version: 0.1.0
+Summary: Multiplayer CLI game 'Mood'
+Author-email: meli ered <eredgepovamelya@gmail.com>
+License-Expression: MIT
+Requires-Python: >=3.8

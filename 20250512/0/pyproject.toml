@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mood"
+version = "0.1.0"
+description = "Multiplayer CLI game 'Mood'"
+authors = [{name = "meli ered", email = "eredgepovamelya@gmail.com"}]
+license = "MIT"
+requires-python = ">=3.8"
+
+[project.scripts]
+mood-server = "mood.server.__main__:main"
+mood-client = "mood.client.__main__:main"
+

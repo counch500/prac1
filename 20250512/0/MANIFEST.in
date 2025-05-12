@@ -1,0 +1,9 @@
+include *.md babel.cfg cmd.mood jgsbat.cow
+include mood/locale/*.pot
+include mood/locale/ru_RU.UTF-8/LC_MESSAGES/*.po
+recursive-include mood *.py
+recursive-include docs/source *
+recursive-include tests *.py
+
+exclude docs/build/*
+exclude mood/locale/*/LC_MESSAGES/*.mo

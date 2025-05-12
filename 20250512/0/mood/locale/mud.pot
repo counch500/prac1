@@ -1,0 +1,75 @@
+# Translations template for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-05-12 13:33+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: mood/server/__main__.py:203
+msgid "Replaced the old monster"
+msgstr ""
+
+#: mood/server/__main__.py:204
+#, python-brace-format
+msgid "{username} added monster {name} to ({x}, {y}) with {hp} {hp_text}\n"
+msgstr ""
+
+#: mood/server/__main__.py:207
+#, python-brace-format
+msgid ""
+"{username} attacked {name} with {weapon} for {damage} {hp_text}, {name} "
+"died"
+msgstr ""
+
+#: mood/server/__main__.py:209
+#, python-brace-format
+msgid ""
+"{username} attacked {name} with {weapon} for {damage} {damage_hp}, {name}"
+" has {hp} {hp_text} left"
+msgstr ""
+
+#: mood/server/__main__.py:211
+#, python-brace-format
+msgid "{username} has joined the game"
+msgstr ""
+
+#: mood/server/__main__.py:213
+#, python-brace-format
+msgid "{username} has left the game"
+msgstr ""
+
+#: mood/server/__main__.py:215
+#, python-brace-format
+msgid "Moving monsters: {status}"
+msgstr ""
+
+#: mood/server/__main__.py:217 mood/server/__main__.py:490
+#, python-brace-format
+msgid "{username}: {message}"
+msgstr ""
+
+#: mood/server/__main__.py:237 mood/server/__main__.py:240
+#: mood/server/__main__.py:414 mood/server/__main__.py:445
+#: mood/server/__main__.py:455 mood/server/__main__.py:457
+msgid "hp"
+msgid_plural "hp"
+msgstr[0] ""
+msgstr[1] ""
+
+#: mood/server/__main__.py:375
+#, python-brace-format
+msgid "Set up locale: {locale}"
+msgstr ""
+
