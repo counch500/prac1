@@ -1,0 +1,17 @@
+movemonsters off
+sayall "Я ИДУ В АТАКУ!"
+addmon hellokitty hello hehe hp 10 coords 0 1
+down
+attack hellokitty with sword
+sayall fatality
+up
+addmon hellokitty hello hehe hp 10 coords 0 0
+locale ru_RU.UTF-8
+addmon jgsbat hello hehe hp 10 coords 1 1
+movemonsters on
+up
+down
+left
+up
+hh
+addmon 		

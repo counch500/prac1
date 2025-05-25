@@ -26,6 +26,7 @@ class TestMudServer(unittest.TestCase):
         self.s.close()
 
     def send_and_receive(self, message, timeout=0.5):
+        print(f">>> Sending: {message}")
         self.s.sendall((message + "\n").encode())
         self.s.settimeout(timeout)
         result = []
@@ -39,12 +40,16 @@ class TestMudServer(unittest.TestCase):
             pass
         self.s.settimeout(None)
         return ''.join(result).strip()
+        print(f"<<< Received: {response}")
+        return response
 
     def test_add_monster(self):
+        print("Test: add_monster")
         res = self.send_and_receive('addmon tux 0 1 100 Hello')
         self.assertIn('added monster tux', res)
 
     def test_encounter_monster(self):
+        print("Test: encounter_monster")
         self.send_and_receive('addmon tux 1 1 100 fdhello')
         self.send_and_receive('move 1 0')
         res = self.send_and_receive('move 0 1')
@@ -52,6 +57,7 @@ class TestMudServer(unittest.TestCase):
         self.assertIn('o_o', res)
 
     def test_attack_monster(self):
+        print("Test: attack_monster")
         self.send_and_receive('addmon dragon 0 1 25 Hello')
         self.send_and_receive('move 0 1')
         res = self.send_and_receive('attack axe dragon')
