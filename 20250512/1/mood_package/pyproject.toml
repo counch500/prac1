@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mood"
+version = "1.0.0"
+description = "MUD game client and server"
+requires-python = ">=3.8"
+dependencies = [
+    "cowsay>=5.0",
+    "babel>=2.12.1",
+    "sphinx>=6.0.0"
+]
+
+[project.scripts]
+mood-server = "mood.server.__main__:serve"
+mood-client = "mood.client.__main__:main"
+
+[tool.setuptools.package-data]
+mood = [
+    "locales/ru_RU/LC_MESSAGES/*.mo",
+    "docs/build/html/*",
+    "monsters/*.txt",
+    "monsters/jgsbat.cow"
+]
+
+[tool.setuptools.package-dir]
+mood = "src/mood"

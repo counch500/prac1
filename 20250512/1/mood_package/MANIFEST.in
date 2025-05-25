@@ -1,0 +1,12 @@
+recursive-include src/mood *.cow
+recursive-include src/mood/monsters *.cow
+
+recursive-include src/mood/locales *.po
+recursive-include src/mood/locales *.mo
+
+recursive-include src/mood/docs/build/html *.html
+
+# Исключаем служебные каталоги сборки
+prune build
+prune dist
+prune *.egg-info
