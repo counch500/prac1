@@ -5,6 +5,7 @@ recursive-include src/mood/locales *.po
 recursive-include src/mood/locales *.mo
 
 recursive-include src/mood/docs/build/html *.html
+recursive-include src/mood/docs/source *
 
 # Исключаем служебные каталоги сборки
 prune build

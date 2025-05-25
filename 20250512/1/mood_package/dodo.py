@@ -11,9 +11,13 @@ def task_html():
     html_dir = build_dir / "html"
 
     return {
-        'actions': ['sphinx-build -M html src/mood/docs/source src/mood/docs/build'],
+        'actions': [
+            (create_folder, [str(build_dir)]),
+            'sphinx-build -M html src/mood/docs/source src/mood/docs/build'
+        ],
         'file_dep': list(map(str, source_dir.glob('*.rst'))) + ['src/mood/docs/source/conf.py'],
         'targets': [str(html_dir / 'index.html')],
+        'uptodate': [False],  # <- ДОБАВЬ ЭТО
         'clean': [(shutil.rmtree, [str(html_dir)])],
     }
 

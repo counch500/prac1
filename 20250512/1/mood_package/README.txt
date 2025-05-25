@@ -20,6 +20,11 @@ doit wheel/sdist
 +doit html/i18l
 
 Проверка установки пакета в трёх чистых окружениях:
+Создание окружения:
+python3 -m venv venv_server
+python3 -m venv venv_client1
+python3 -m venv venv_client2
+
 source venv_server/bin/activate
 pip install .
 deactivate
