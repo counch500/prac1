@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html lang="ru" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Сервер MOOD MUD &#8212; документация MOOD 1.0</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=686e5160" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=9ca2116e"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=5b699b7f"></script>
+    <link rel="index" title="Алфавитный указатель" href="genindex.html" />
+    <link rel="search" title="Поиск" href="search.html" />
+    <link rel="next" title="Клиент MOOD MUD" href="client.html" />
+    <link rel="prev" title="Добро пожаловать в документацию MOOD MUD!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="module-mood.server.__main__">
+<span id="mood-mud"></span><h1>Сервер MOOD MUD<a class="headerlink" href="#module-mood.server.__main__" title="Ссылка на этот заголовок">¶</a></h1>
+<p>Server module for MOOD MUD game.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="mood.server.__main__.MUD">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mood.server.__main__.</span></span><span class="sig-name descname"><span class="pre">MUD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/server/__main__.html#MUD"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.server.__main__.MUD" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Базовые классы: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Main MUD game class handling player actions and game state.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mood.server.__main__.MUD.player_position">
+<span class="sig-name descname"><span class="pre">player_position</span></span><a class="headerlink" href="#mood.server.__main__.MUD.player_position" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Current player position (x, y)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mood.server.__main__.MUD.weapons">
+<span class="sig-name descname"><span class="pre">weapons</span></span><a class="headerlink" href="#mood.server.__main__.MUD.weapons" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Available weapons and their damage values</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mood.server.__main__.MUD.username">
+<span class="sig-name descname"><span class="pre">username</span></span><a class="headerlink" href="#mood.server.__main__.MUD.username" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Player’s username</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="mood.server.__main__.MUD.jgsbat_func">
+<span class="sig-name descname"><span class="pre">jgsbat_func</span></span><a class="headerlink" href="#mood.server.__main__.MUD.jgsbat_func" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Custom cow function for jgsbat monster</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.server.__main__.MUD.add_monster">
+<span class="sig-name descname"><span class="pre">add_monster</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hello</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/server/__main__.html#MUD.add_monster"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.server.__main__.MUD.add_monster" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Add monster to game field.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>int</em>) – X coordinate (0-9)</p></li>
+<li><p><strong>y</strong> (<em>int</em>) – Y coordinate (0-9)</p></li>
+<li><p><strong>hp</strong> (<em>int</em>) – Hit points (positive integer)</p></li>
+<li><p><strong>hello</strong> (<em>str</em>) – Greeting message</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Monster name</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>«1» if replaced existing monster, «0» otherwise</dt><dd><p>or error message</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.server.__main__.MUD.attack">
+<span class="sig-name descname"><span class="pre">attack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weapon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/server/__main__.html#MUD.attack"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.server.__main__.MUD.attack" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Attack monster with specified weapon.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weapon</strong> (<em>str</em>) – Weapon name (sword/spear/axe)</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Monster name</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>Attack result formatted as «damage remaining_hp»</dt><dd><p>or error message</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.server.__main__.MUD.encounter">
+<span class="sig-name descname"><span class="pre">encounter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/server/__main__.html#MUD.encounter"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.server.__main__.MUD.encounter" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Handle monster encounter at specified coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>int</em>) – X coordinate to check</p></li>
+<li><p><strong>y</strong> (<em>int</em>) – Y coordinate to check</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>Formatted encounter message or empty string if no monster</p>
+</dd>
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.server.__main__.MUD.move_player">
+<span class="sig-name descname"><span class="pre">move_player</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/server/__main__.html#MUD.move_player"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.server.__main__.MUD.move_player" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Move player by delta coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d_x</strong> (<em>int</em>) – X coordinate delta</p></li>
+<li><p><strong>d_y</strong> (<em>int</em>) – Y coordinate delta</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>New position as «x y»</p>
+</dd>
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="mood.server.__main__.MUD.moving">
+<span class="sig-name descname"><span class="pre">moving</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d_x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_y</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/server/__main__.html#MUD.moving"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.server.__main__.MUD.moving" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Move player and handle potential encounters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d_x</strong> (<em>int</em>) – X direction delta</p></li>
+<li><p><strong>d_y</strong> (<em>int</em>) – Y direction delta</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>Move result with optional encounter message</p>
+</dd>
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mood.server.__main__.broadcast_message">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mood.server.__main__.</span></span><span class="sig-name descname"><span class="pre">broadcast_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/server/__main__.html#broadcast_message"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.server.__main__.broadcast_message" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Send message to all connected clients.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>str</em>) – Message to broadcast</p></li>
+<li><p><strong>exclude</strong> (<em>str</em><em>, </em><em>optional</em>) – Username to exclude from broadcast</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mood.server.__main__.handle_client">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mood.server.__main__.</span></span><span class="sig-name descname"><span class="pre">handle_client</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">writer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/server/__main__.html#handle_client"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.server.__main__.handle_client" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Handle incoming client connection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reader</strong> – asyncio StreamReader</p></li>
+<li><p><strong>writer</strong> – asyncio StreamWriter</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mood.server.__main__.main">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mood.server.__main__.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/server/__main__.html#main"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.server.__main__.main" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Main server entry point.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mood.server.__main__.send_messages">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mood.server.__main__.</span></span><span class="sig-name descname"><span class="pre">send_messages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">writer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/server/__main__.html#send_messages"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.server.__main__.send_messages" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Send messages from queue to client.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>writer</strong> – asyncio StreamWriter</p></li>
+<li><p><strong>username</strong> (<em>str</em>) – Recipient username</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="mood.server.__main__.wander_monsters">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">mood.server.__main__.</span></span><span class="sig-name descname"><span class="pre">wander_monsters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mood/server/__main__.html#wander_monsters"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#mood.server.__main__.wander_monsters" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Periodically move monsters around the game field.</p>
+</dd></dl>
+
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">MOOD</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Искать" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Навигация</h3>
+<p class="caption" role="heading"><span class="caption-text">Содержание:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Сервер MOOD MUD</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#mood.server.__main__.MUD"><code class="docutils literal notranslate"><span class="pre">MUD</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mood.server.__main__.broadcast_message"><code class="docutils literal notranslate"><span class="pre">broadcast_message()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mood.server.__main__.handle_client"><code class="docutils literal notranslate"><span class="pre">handle_client()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mood.server.__main__.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mood.server.__main__.send_messages"><code class="docutils literal notranslate"><span class="pre">send_messages()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#mood.server.__main__.wander_monsters"><code class="docutils literal notranslate"><span class="pre">wander_monsters()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="client.html">Клиент MOOD MUD</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="предыдущая глава">Добро пожаловать в документацию MOOD MUD!</a></li>
+      <li>Next: <a href="client.html" title="следующая глава">Клиент MOOD MUD</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, kSSH.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 8.1.3</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/server.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

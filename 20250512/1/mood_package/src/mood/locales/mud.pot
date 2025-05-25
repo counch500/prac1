@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-05-25 16:59+0300\n"
+"POT-Creation-Date: 2025-05-25 23:22+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,63 +17,63 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: src/mood/server/__main__.py:218
+#: src/mood/server/__main__.py:220
 msgid "Replaced the old monster"
 msgstr ""
 
-#: src/mood/server/__main__.py:219
+#: src/mood/server/__main__.py:221
 #, python-brace-format
 msgid "{username} added monster {name} to ({x}, {y}) with {hp} {hp_text}\n"
 msgstr ""
 
-#: src/mood/server/__main__.py:222
+#: src/mood/server/__main__.py:224
 #, python-brace-format
 msgid ""
 "{username} attacked {name} with {weapon} for {damage} {hp_text}, {name} "
 "died"
 msgstr ""
 
-#: src/mood/server/__main__.py:224
+#: src/mood/server/__main__.py:226
 #, python-brace-format
 msgid ""
 "{username} attacked {name} with {weapon} for {damage} {damage_hp}, {name}"
 " has {hp} {hp_text} left"
 msgstr ""
 
-#: src/mood/server/__main__.py:226
+#: src/mood/server/__main__.py:228
 #, python-brace-format
 msgid "{username} has joined the game"
 msgstr ""
 
-#: src/mood/server/__main__.py:228
+#: src/mood/server/__main__.py:230
 #, python-brace-format
 msgid "{username} has left the game"
 msgstr ""
 
-#: src/mood/server/__main__.py:230
+#: src/mood/server/__main__.py:232
 #, python-brace-format
 msgid "Moving monsters: {status}"
 msgstr ""
 
-#: src/mood/server/__main__.py:233
+#: src/mood/server/__main__.py:235
 #, python-brace-format
 msgid "{name} moved one cell {direction}"
 msgstr ""
 
-#: src/mood/server/__main__.py:235 src/mood/server/__main__.py:522
+#: src/mood/server/__main__.py:237 src/mood/server/__main__.py:524
 #, python-brace-format
 msgid "{username}: {message}"
 msgstr ""
 
-#: src/mood/server/__main__.py:253 src/mood/server/__main__.py:256
-#: src/mood/server/__main__.py:449 src/mood/server/__main__.py:480
-#: src/mood/server/__main__.py:490 src/mood/server/__main__.py:492
+#: src/mood/server/__main__.py:255 src/mood/server/__main__.py:258
+#: src/mood/server/__main__.py:451 src/mood/server/__main__.py:482
+#: src/mood/server/__main__.py:492 src/mood/server/__main__.py:494
 msgid "hp"
 msgid_plural "hp"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/mood/server/__main__.py:400
+#: src/mood/server/__main__.py:402
 #, python-brace-format
 msgid "Set up locale: {locale}"
 msgstr ""

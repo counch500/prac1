@@ -8,8 +8,6 @@ babel = "*"
 coverage = "*"
 doit = "*"
 python-cowsay = "*"
-sphinx = "*"
-cowsay = "*"
 
 [dev-packages]
 flake8 = "*"

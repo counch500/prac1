@@ -1,3 +1,0 @@
-"""
-Common modules for MOOD.
-"""

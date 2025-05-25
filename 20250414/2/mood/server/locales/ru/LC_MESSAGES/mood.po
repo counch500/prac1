@@ -19,187 +19,104 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: mood/server/__main__.py:262
+#: mood/server/__main__.py:260
 #, python-brace-format
 msgid "{n} очко здоровья"
 msgid_plural "{n} очков здоровья"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{n} очко здоровья"
+msgstr[1] "{n} очков здоровья"
 
-#: mood/server/__main__.py:269
+#: mood/server/__main__.py:267
 #, python-brace-format
 msgid "{n} урон"
 msgid_plural "{n} урона"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "{n} урон"
+msgstr[1] "{n} урона"
 
-#: mood/server/__main__.py:326 mood/server/__main__.py:338
-#: mood/server/__main__.py:358 mood/server/__main__.py:370
-#: mood/server/__main__.py:402 mood/server/__main__.py:416
-#: mood/server/__main__.py:420
+#: mood/server/__main__.py:299
+#, python-brace-format
+msgid "{username} has joined the game"
+msgstr "{username} присоединился к игре"
+
+#: mood/server/__main__.py:315
 msgid "Invalid arguments"
 msgstr "Неверные аргументы"
 
-#: mood/server/__main__.py:332
-#, fuzzy, python-brace-format
+#: mood/server/__main__.py:320
+#, python-brace-format
 msgid "Set up locale: {args}"
-msgstr "Установлена локаль: {}\n"
+msgstr "Установлена локаль: {args}"
 
-#: mood/server/__main__.py:334
+#: mood/server/__main__.py:322
 msgid "Unsupported locale"
-msgstr ""
+msgstr "Неподдерживаемая локаль"
 
-#: mood/server/__main__.py:352
+#: mood/server/__main__.py:328
+#, python-brace-format
+msgid "Moving monsters: {args}"
+msgstr "Перемещение монстров: {args}"
+
+#: mood/server/__main__.py:333
 msgid "Cannot add unknown monster"
 msgstr "Нельзя добавить неизвестного монстра"
 
-#: mood/server/__main__.py:355
+#: mood/server/__main__.py:335
 msgid "Cannot add monster to player's position"
 msgstr "Нельзя добавить монстра на позицию игрока"
 
-#: mood/server/__main__.py:376
-#, fuzzy
-msgid "Unknown weapon"
-msgstr "Неизвестное оружие\n"
-
-#: mood/server/__main__.py:379
-#, fuzzy, python-brace-format
-msgid "No such monster {name}"
-msgstr "Нет такого монстра {}\n"
-
-#: mood/server/__main__.py:385
-#, fuzzy, python-brace-format
-msgid "No {name} here"
-msgstr "Здесь нет {}\n"
-
-#: mood/server/__main__.py:410
+#: mood/server/__main__.py:345
 #, python-brace-format
-msgid ""
-"Moved to ({new_position})\n"
-"{encounter_message}"
-msgstr ""
+msgid "{username} added monster {name} to ({x}, {y}) with {hp}"
+msgstr "{username} добавил монстра {name} на ({x}, {y}) с {hp}"
 
-#: mood/server/__main__.py:413
+#: mood/server/__main__.py:347
+msgid "Replaced the old monster"
+msgstr "Заменен старый монстр"
+
+#: mood/server/__main__.py:353
+msgid "Unknown weapon"
+msgstr "Неизвестное оружие"
+
+#: mood/server/__main__.py:355
+#, python-brace-format
+msgid "No such monster {name}"
+msgstr "Нет такого монстра {name}"
+
+#: mood/server/__main__.py:358
+#, python-brace-format
+msgid "No {name} here"
+msgstr "Здесь нет {name}"
+
+#: mood/server/__main__.py:375
+#, python-brace-format
+msgid "Moved to ({new_position})\n{encounter_message}"
+msgstr "Переместился в ({new_position})\n{encounter_message}"
+
+#: mood/server/__main__.py:377
 #, python-brace-format
 msgid "Moved to ({new_position})"
-msgstr ""
+msgstr "Переместился в ({new_position})"
 
-#: mood/server/__main__.py:426
-#, fuzzy
+#: mood/server/__main__.py:385
+#, python-brace-format
+msgid "{username}: {message}"
+msgstr "{username}: {message}"
+
+#: mood/server/__main__.py:387
 msgid "Unknown command"
-msgstr "Неизвестное оружие\n"
+msgstr "Неизвестная команда"
 
-#~ msgid "{} added monster {} to ({}, {}) with {} hp"
-#~ msgid_plural "{} added monster {} to ({}, {}) with {} hp"
-#~ msgstr[0] "{} добавил(а) монстра {} на ({}, {}) с {} очком здоровья"
-#~ msgstr[1] "{} добавил(а) монстра {} на ({}, {}) с {} очками здоровья"
-#~ msgstr[2] "{} добавил(а) монстра {} на ({}, {}) с {} очками здоровья"
+#: mood/server/__main__.py:389
+#, python-brace-format
+msgid "{username} has left the game"
+msgstr "{username} покинул игру"
 
-#~ msgid ""
-#~ "[SERVER] Moved to ({})\n"
-#~ "{}"
-#~ msgstr ""
-#~ "[СЕРВЕР] Переместился в ({})\n"
-#~ "{}"
+#: mood/server/__main__.py:393
+#, python-brace-format
+msgid "{username} attacked {name} with {weapon} for {damage}, {name} died"
+msgstr "{username} атаковал {name} с помощью {weapon} и нанёс {damage}, {name} умер"
 
-#~ msgid "[SERVER] Moved to ({})"
-#~ msgstr "[СЕРВЕР] Переместился в ({})"
-
-#~ msgid "User {} disconnected"
-#~ msgstr "Игрок {} отключился"
-
-#~ msgid "{} connected to raid!\n"
-#~ msgstr "{} подключился к нам!"
-
-#~ msgid "Failed to add jgsbat: {error}"
-#~ msgstr "Не удалось добавить jgsbat: {error}"
-
-#~ msgid "Username already taken\n"
-#~ msgstr "Имя пользователя уже занято\n"
-
-#~ msgid "Welcome to MUD, {}!\n"
-#~ msgstr "Добро пожаловать в MUD, {}!\n"
-
-#~ msgid "Usage: locale <lang>\n"
-#~ msgstr "Использование: locale <язык>\n"
-
-#~ msgid "Only ru_RU.UTF-8 and en_US.UTF-8 locales are available\n"
-#~ msgstr "Доступны только локали ru_RU.UTF-8 и en_US.UTF-8\n"
-
-#~ msgid "Added monster {} to ({}, {}) saying {}"
-#~ msgstr "Добавлен монстр {} на ({}, {}) говорящий {}"
-
-#~ msgid "{} added monster {} to ({}, {}) saying {} with {} hp"
-#~ msgid_plural "{} added monster {} to ({}, {}) saying {} with {} hp"
-#~ msgstr[0] "{} добавил(а) монстра {} на ({}, {}) говорящего {} с {} очком здоровья"
-#~ msgstr[1] "{} добавил(а) монстра {} на ({}, {}) говорящего {} с {} очками здоровья"
-#~ msgstr[2] "{} добавил(а) монстра {} на ({}, {}) говорящего {} с {} очками здоровья"
-
-#~ msgid "Replaced the old monster\n"
-#~ msgstr "Заменен старый монстр\n"
-
-#~ msgid "Attacked {} with {}, damage {} hp\n"
-#~ msgid_plural "Attacked {} with {}, damage {} hp\n"
-#~ msgstr[0] "Атаковал {} с {}, урон {} очко здоровья\n"
-#~ msgstr[1] "Атаковал {} с {}, урон {} очка здоровья\n"
-#~ msgstr[2] "Атаковал {} с {}, урон {} очков здоровья\n"
-
-#~ msgid "{} died\n"
-#~ msgstr "{} умер\n"
-
-#~ msgid "{} has {} hp left\n"
-#~ msgid_plural "{} has {} hp left\n"
-#~ msgstr[0] "У {} осталось {} очко здоровья\n"
-#~ msgstr[1] "У {} осталось {} очка здоровья\n"
-#~ msgstr[2] "У {} осталось {} очков здоровья\n"
-
-#~ msgid "{} attacked {} with {} for {} hp, {} died"
-#~ msgid_plural "{} attacked {} with {} for {} hp, {} died"
-#~ msgstr[0] "{} атаковал(а) {} используя {} и нанес(ла) {} урон, {} погиб"
-#~ msgstr[1] "{} атаковал(а) {} используя {} и нанес(ла) {} урона, {} погиб"
-#~ msgstr[2] "{} атаковал(а) {} используя {} и нанес(ла) {} урона, {} погиб"
-
-#~ msgid "{} attacked {} with {} for {} hp, {} has {} hp left"
-#~ msgid_plural "{} attacked {} with {} for {} hp, {} has {} hp left"
-#~ msgstr[0] "{} ударил(а) {} используя {} ({} очко), у {} осталось {} очко"
-#~ msgstr[1] "{} ударил(а) {} используя {} ({} очка), у {} осталось {} очка"
-#~ msgstr[2] "{} ударил(а) {} используя {} ({} очков), у {} осталось {} очков"
-
-#~ msgid "Invalid arguments\n"
-#~ msgstr "Неверные аргументы\n"
-
-#~ msgid "Moving monsters: on"
-#~ msgstr "Блуждающие монстры: вкл"
-
-#~ msgid "Moving monsters: off"
-#~ msgstr "Блуждающие монстры: выкл"
-
-#~ msgid "Invalid argument. Use 'on' or 'off'"
-#~ msgstr "Неправильные аргументы. Пиши on или off"
-
-#~ msgid "Invalid arguments. Usage: movemonsters on|off"
-#~ msgstr "Неправильные аргументы. Использование: movemonsters on|off"
-
-#~ msgid "User {} leave the dungeon...\n"
-#~ msgstr "Игрок {} покидает подземелье...\n"
-
-#~ msgid "[SERVER] No monsters to move"
-#~ msgstr "нет монстров для пермещения"
-
-#~ msgid "up"
-#~ msgstr "вверх"
-
-#~ msgid "down"
-#~ msgstr "вниз"
-
-#~ msgid "left"
-#~ msgstr "влево"
-
-#~ msgid "right"
-#~ msgstr "вправо"
-
-#~ msgid "{name} moved one cell {direction}"
-#~ msgstr "{name} переместился на одну клетку {direction}"
-
+#: mood/server/__main__.py:397
+#, python-brace-format
+msgid "{username} attacked {name} with {weapon} for {damage}, {name} has {hp} left"
+msgstr "{username} атаковал {name} с помощью {weapon} и нанёс {damage}, у {name} осталось {hp}"

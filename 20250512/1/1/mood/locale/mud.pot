@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-05-24 20:56+0300\n"
+"POT-Creation-Date: 2025-05-25 16:58+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -60,14 +60,14 @@ msgstr ""
 msgid "{name} moved one cell {direction}"
 msgstr ""
 
-#: mood/server/__main__.py:218 mood/server/__main__.py:499
+#: mood/server/__main__.py:218 mood/server/__main__.py:505
 #, python-brace-format
 msgid "{username}: {message}"
 msgstr ""
 
 #: mood/server/__main__.py:236 mood/server/__main__.py:239
-#: mood/server/__main__.py:426 mood/server/__main__.py:457
-#: mood/server/__main__.py:467 mood/server/__main__.py:469
+#: mood/server/__main__.py:432 mood/server/__main__.py:463
+#: mood/server/__main__.py:473 mood/server/__main__.py:475
 msgid "hp"
 msgid_plural "hp"
 msgstr[0] ""
