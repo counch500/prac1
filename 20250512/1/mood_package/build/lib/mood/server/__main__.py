@@ -103,8 +103,10 @@ class MUD:
         self.jgsbat_func = None
         try:
             cow_path = importlib.resources.files("mood.monsters").joinpath("jgsbat.cow")
-    # Вызываем cowsay, указывая путь к файлу
-            return cowsay.cowsay(msg, cowfile=str(cow_path))
+
+            # Создаём функцию и сохраняем в self.jgsbat_func
+            self.jgsbat_func = lambda msg: cowsay.cowsay(msg, cowfile=str(cow_path))
+
         except Exception as e:
             print(f"Ошибка загрузки монстра jgsbat: {e}")
 

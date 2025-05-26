@@ -18,7 +18,10 @@ src/mood/docs/build/html/server.html
 src/mood/docs/build/html/_modules/index.html
 src/mood/docs/build/html/_modules/mood/client/__main__.html
 src/mood/docs/build/html/_modules/mood/server/__main__.html
+src/mood/docs/source/client.rst
 src/mood/docs/source/conf.py
+src/mood/docs/source/index.rst
+src/mood/docs/source/server.rst
 src/mood/locales/ru_RU/LC_MESSAGES/mud.mo
 src/mood/locales/ru_RU/LC_MESSAGES/mud.po
 src/mood/monsters/__init__.py

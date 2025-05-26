@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-05-25 13:14+0300\n"
+"POT-Creation-Date: 2025-05-25 23:22+0300\n"
 "PO-Revision-Date: 2025-05-05 11:25+0300\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru_RU\n"
@@ -19,16 +19,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: src/mood/server/__main__.py:208
+#: src/mood/server/__main__.py:220
 msgid "Replaced the old monster"
 msgstr "Заменен старый монстр"
 
-#: src/mood/server/__main__.py:209
+#: src/mood/server/__main__.py:221
 #, python-brace-format
 msgid "{username} added monster {name} to ({x}, {y}) with {hp} {hp_text}\n"
 msgstr "{username} добавил монстра {name} на ({x}, {y}) с {hp} {hp_text}"
 
-#: src/mood/server/__main__.py:212
+#: src/mood/server/__main__.py:224
 #, python-brace-format
 msgid ""
 "{username} attacked {name} with {weapon} for {damage} {hp_text}, {name} "
@@ -37,7 +37,7 @@ msgstr ""
 "{username} атаковал {name} с помощью {weapon} и нанес {damage} {hp_text},"
 " {name} погиб"
 
-#: src/mood/server/__main__.py:214
+#: src/mood/server/__main__.py:226
 #, python-brace-format
 msgid ""
 "{username} attacked {name} with {weapon} for {damage} {damage_hp}, {name}"
@@ -46,41 +46,41 @@ msgstr ""
 "{username} атаковал {name} с помощью {weapon} и нанес {damage} "
 "{damage_hp}, у {name} осталось {hp} {hp_text}"
 
-#: src/mood/server/__main__.py:216
+#: src/mood/server/__main__.py:228
 #, python-brace-format
 msgid "{username} has joined the game"
 msgstr "{username} присоединился к игре"
 
-#: src/mood/server/__main__.py:218
+#: src/mood/server/__main__.py:230
 #, python-brace-format
 msgid "{username} has left the game"
 msgstr "{username} покинул игру"
 
-#: src/mood/server/__main__.py:220
+#: src/mood/server/__main__.py:232
 #, python-brace-format
 msgid "Moving monsters: {status}"
 msgstr "Перемещение монстров: {status}"
 
-#: src/mood/server/__main__.py:223
+#: src/mood/server/__main__.py:235
 #, python-brace-format
 msgid "{name} moved one cell {direction}"
 msgstr "{name} переместился на одну единицу {direction}"
 
-#: src/mood/server/__main__.py:225 src/mood/server/__main__.py:512
+#: src/mood/server/__main__.py:237 src/mood/server/__main__.py:524
 #, python-brace-format
 msgid "{username}: {message}"
 msgstr "{username}: {message}"
 
-#: src/mood/server/__main__.py:243 src/mood/server/__main__.py:246
-#: src/mood/server/__main__.py:439 src/mood/server/__main__.py:470
-#: src/mood/server/__main__.py:480 src/mood/server/__main__.py:482
+#: src/mood/server/__main__.py:255 src/mood/server/__main__.py:258
+#: src/mood/server/__main__.py:451 src/mood/server/__main__.py:482
+#: src/mood/server/__main__.py:492 src/mood/server/__main__.py:494
 msgid "hp"
 msgid_plural "hp"
 msgstr[0] "очко здоровья"
 msgstr[1] "очка здоровья"
 msgstr[2] "очков здоровья"
 
-#: src/mood/server/__main__.py:390
+#: src/mood/server/__main__.py:402
 #, python-brace-format
 msgid "Set up locale: {locale}"
 msgstr "Установлена локаль: {locale}"
