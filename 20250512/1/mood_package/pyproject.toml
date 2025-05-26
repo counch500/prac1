@@ -8,9 +8,10 @@ version = "1.0.0"
 description = "MUD game client and server"
 requires-python = ">=3.8"
 dependencies = [
-    "cowsay>=5.0",
-    "babel>=2.12.1",
-    "sphinx>=6.0.0"
+    "python-cowsay",
+    "babel",
+    "sphinx",
+    "doit"
 ]
 
 [project.scripts]

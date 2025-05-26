@@ -3,6 +3,7 @@ Name: mood
 Version: 1.0.0
 Summary: MUD game client and server
 Requires-Python: >=3.8
-Requires-Dist: cowsay>=5.0
-Requires-Dist: babel>=2.12.1
-Requires-Dist: sphinx>=6.0.0
+Requires-Dist: python-cowsay
+Requires-Dist: babel
+Requires-Dist: sphinx
+Requires-Dist: doit
