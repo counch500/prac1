@@ -2,7 +2,7 @@ import unittest
 import multiprocessing
 import socket
 import time
-from mood.server import __main__ as server
+from scr.mood.server import __main__ as server
 
 
 class TestMudServer(unittest.TestCase):

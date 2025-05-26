@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import MagicMock, patch
-from mood.client.__main__ import Client_MUD
+from src.mood.client.__main__ import Client_MUD
 
 class TestClientCommandTransformations(unittest.TestCase):
 
